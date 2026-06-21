@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigi Gate Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" href="dashboard.css" />
+</head>
+<body>
+<div class="container">
+    <h1>Vigi Gate - Digital Visitor Management</h1>
+    <p><a href="/risk-rules" style="color:#2563eb;font-weight:700;text-decoration:none;">Kelola Risk Rules</a></p>
+    <p><a href="/visitor-history" style="color:#2563eb;font-weight:700;text-decoration:none;">Lihat Data Visitor 30 Hari Terakhir</a></p>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Smart Registration</h3>
+            <div id="formMessage"></div>
+            <form id="registerForm" enctype="multipart/form-data">
+                <label for="fullName">Nama</label>
+                <input id="fullName" name="fullName" required />
+
+                <label for="nik">NIK (16 digit)</label>
+                <input id="nik" name="nik" minlength="16" maxlength="16" pattern="\d{16}" inputmode="numeric" title="NIK harus 16 digit angka" required />
+
+                <label for="purpose">Tujuan</label>
+                <textarea id="purpose" name="purpose" rows="3" required></textarea>
+
+                <label for="photo">Foto</label>
+                <input id="photo" name="photo" type="file" accept="image/*" />
+
+                <button type="submit">Check-in Tamu</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="top-actions">
+                <h3 style="margin: 0;">Realtime Log - Active Visitors</h3>
+                <button id="refreshBtn" type="button">Refresh</button>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>NIK</th>
+                    <th>Tujuan</th>
+                    <th>Risk</th>
+                    <th>Skor</th>
+                    <th>Aksi</th>
+                </tr>
+                </thead>
+                <tbody id="activeBody">
+                <tr>
+                    <td colspan="6">Memuat data...</td>
+                </tr>
+                </tbody>
+            </table>
+            
+            <div class="pagination-container" id="activePagination" style="display: none;">
+                <div class="pagination-info">
+                    <span id="activePageInfo"></span>
+                </div>
+                <div class="pagination-controls">
+                    <button id="activePrevBtn" class="pagination-btn">Previous</button>
+                    <div id="activePageNumbers" class="page-numbers"></div>
+                    <button id="activeNextBtn" class="pagination-btn">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 18px;">
+        <div class="top-actions">
+            <h3 style="margin: 0;">AI Summary Report</h3>
+            <button id="summaryBtn" type="button">Generate Summary</button>
+        </div>
+        <div id="summaryArea" class="summary">
+            <p>Total Kunjungan: <span th:text="${todaySummary.totalVisitToday}">0</span></p>
+            <p>Masih di Area: <span th:text="${todaySummary.totalInsideArea}">0</span></p>
+            <p>Green: <span th:text="${todaySummary.greenCount}">0</span>,
+                Yellow: <span th:text="${todaySummary.yellowCount}">0</span>,
+                Red: <span th:text="${todaySummary.redCount}">0</span>
+            </p>
+            <p th:text="${todaySummary.aiSummary}"></p>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 18px;">
+        <div class="top-actions">
+            <h3 style="margin: 0;">Data Visitor Hari Ini</h3>
+            <button id="refreshTodayBtn" type="button">Refresh</button>
+        </div>
+        
+        <table>
+            <thead>
+            <tr>
+                <th>Nama</th>
+                <th>NIK</th>
+                <th>Jam Checkin</th>
+                <th>Tujuan</th>
+                <th>Jam Checkout</th>
+                <th>Risk</th>
+                <th>Skor</th>
+                <th>Aksi</th>
+            </tr>
+            </thead>
+            <tbody id="todayBody">
+            <tr>
+                <td colspan="8">Memuat data...</td>
+            </tr>
+            </tbody>
+        </table>
+        
+        <div class="pagination-container" id="todayPagination" style="display: none;">
+            <div class="pagination-info">
+                <span id="todayPageInfo"></span>
+            </div>
+            <div class="pagination-controls">
+                <button id="todayPrevBtn" class="pagination-btn">Previous</button>
+                <div id="todayPageNumbers" class="page-numbers"></div>
+                <button id="todayNextBtn" class="pagination-btn">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h3>Konfirmasi Hapus Data</h3>
+        <p>Apakah Anda yakin ingin menghapus data visitor ini?</p>
+        <div class="modal-buttons">
+            <button id="confirmDelete" class="modal-btn modal-confirm">Hapus</button>
+            <button id="cancelDelete" class="modal-btn modal-cancel">Batal</button>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/dashboard.js}" src="dashboard.js"></script>
+</body>
+</html>
