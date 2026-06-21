@@ -126,6 +126,23 @@ tasks.register('installApp') {
             'logging.config=classpath:logback-spring.xml',
             '# logging.config=classpath:logback-spring.xml\nlogging.config=file:./config/logback-spring.xml'
         )
+
+		content = content.replace(
+            'logging.level.org.atmosphere=INFO',
+            '# logging.level.org.atmosphere=INFO\nlogging.level.org.atmosphere=WARN'
+        )
+
+		content = content.replace(
+            'logging.level.com.vaadin.flow.server.communication=INFO',
+            '# logging.level.com.vaadin.flow.server.communication=INFO\nlogging.level.com.vaadin.flow.server.communication=WARN'
+        )
+
+		if (content.contains('vaadin.productionMode=false')) {
+            content = content.replace('vaadin.productionMode=false', 'vaadin.productionMode=true')
+        } else if (!content.contains('vaadin.productionMode')) {
+            content += '\n\n# Diubah otomatis oleh Gradle Assembly Build\nvaadin.productionMode=true'
+        }
+		
         appProps.text = content
     }
 }
