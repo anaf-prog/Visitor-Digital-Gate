@@ -30,6 +30,7 @@ dependencies {
 	implementation 'com.vaadin:vaadin-spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'com.cloudinary:cloudinary-http5:2.1.0'
 	implementation 'org.apache.httpcomponents.client5:httpclient5'
 	implementation 'com.cloudinary:cloudinary-taglib:2.1.0'
