@@ -11,10 +11,12 @@ import com.vigi.gate.views.component.riskrule.RiskRuleFormCard;
 import com.vigi.gate.views.component.riskrule.RiskRuleTableCard;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 
 @Route("risk-rules")
 @RequiredArgsConstructor
+@PermitAll
 public class RiskruleView extends VerticalLayout {
 
    private final RiskRuleService riskRuleService;

@@ -15,12 +15,14 @@ import com.vigi.gate.views.component.dashboard.SummaryReportCard;
 import com.vigi.gate.views.component.dashboard.TodayVisitorsCard;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Route("")
 @Slf4j
 @RequiredArgsConstructor
+@PermitAll
 public class MainView extends VerticalLayout {
 
     private final VisitorManagementService visitorManagementService;

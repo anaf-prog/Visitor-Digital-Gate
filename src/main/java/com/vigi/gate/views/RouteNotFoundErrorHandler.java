@@ -5,9 +5,11 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.ErrorParameter;
 import com.vaadin.flow.router.HasErrorParameter;
 import com.vaadin.flow.router.NotFoundException;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+@AnonymousAllowed
 public class RouteNotFoundErrorHandler extends Div implements HasErrorParameter<NotFoundException> {
 
     @Override

@@ -20,10 +20,12 @@ import com.vigi.gate.views.component.visitorhistory.VisitorHistoryFilterCard;
 import com.vigi.gate.views.component.visitorhistory.VisitorHistoryTableCard;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 
 @Route("visitor-history")
 @RequiredArgsConstructor
+@PermitAll
 public class VistorHistoryView extends VerticalLayout {
 
     private final VisitorManagementService visitorManagementService;
