@@ -1,10 +1,7 @@
 package com.vigi.gate.views.component.dashboard;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -25,9 +22,6 @@ public class SummaryReportCard extends BaseCard {
     private final Span greenBadge = new Span("GREEN: 0");
     private final Span yellowBadge = new Span("YELLOW: 0");
     private final Span redBadge = new Span("RED: 0");
-    
-    // Kotak Narasi AI Summary
-    private final Paragraph summaryParagraph = new Paragraph("Memuat data rangkuman...");
 
     public SummaryReportCard(VisitorManagementService visitorManagementService) {
         super("");
@@ -36,14 +30,9 @@ public class SummaryReportCard extends BaseCard {
         // --- HEADER LAYOUT ---
         H3 summaryHeaderTitle = new H3("Summary Report");
         summaryHeaderTitle.getStyle().set("margin", "0");
-        
-        Button refreshSummaryBtn = new Button("Generate Summary", VaadinIcon.PLAY.create(), event -> refreshSummaryData());
-        refreshSummaryBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
-        refreshSummaryBtn.getStyle().set("background-color", "#2563eb");
 
-        HorizontalLayout summaryHeaderLayout = new HorizontalLayout(summaryHeaderTitle, refreshSummaryBtn);
+        HorizontalLayout summaryHeaderLayout = new HorizontalLayout(summaryHeaderTitle);
         summaryHeaderLayout.setWidthFull();
-        summaryHeaderLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
         summaryHeaderLayout.setAlignItems(Alignment.CENTER);
 
         // --- METRICS HUB / CARD GRID ---
@@ -87,38 +76,11 @@ public class SummaryReportCard extends BaseCard {
 
         metricsGrid.add(totalBox, insideBox, riskBox);
 
-        VerticalLayout aiContainer = new VerticalLayout();
-        aiContainer.setWidthFull();
-        aiContainer.setPadding(true);
-        aiContainer.setSpacing(false);
-        aiContainer.getStyle()
-            .set("background-color", "#f1f5f9")
-            .set("border-left", "4px solid #3b82f6")
-            .set("border-radius", "0 8px 8px 0")
-            .set("margin-top", "16px")
-            .set("box-sizing", "border-box"); 
+        // Masukkan komponen ke dalam BaseCard layout
+        add(summaryHeaderLayout, metricsGrid);
 
-        HorizontalLayout aiHeader = new HorizontalLayout();
-        aiHeader.setAlignItems(Alignment.CENTER);
-        aiHeader.setSpacing(true);
-        
-        var aiIcon = VaadinIcon.AUTOMATION.create();
-        aiIcon.getStyle().set("color", "#2563eb").set("font-size", "18px");
-        
-        Span aiTitle = new Span("System Executive Summary");
-        aiTitle.getStyle().set("font-weight", "700").set("color", "#1e293b").set("font-size", "14px");
-        aiHeader.add(aiIcon, aiTitle);
-
-        summaryParagraph.getStyle()
-            .set("margin", "8px 0 0 0")
-            .set("font-size", "13.5px")
-            .set("color", "#334155")
-            .set("line-height", "1.6");
-
-        aiContainer.add(aiHeader, summaryParagraph);
-
-        // Masukkan semua ke dalam BaseCard layout
-        add(summaryHeaderLayout, metricsGrid, aiContainer);
+        // Memuat data awal saat komponen diinisialisasi
+        refreshSummaryData();
     }
 
     public void refreshSummaryData() {
@@ -132,13 +94,6 @@ public class SummaryReportCard extends BaseCard {
         greenBadge.setText("GREEN: " + summary.getGreenCount());
         yellowBadge.setText("YELLOW: " + summary.getYellowCount());
         redBadge.setText("RED: " + summary.getRedCount());
-        
-        // Update Narasi AI
-        if (summary.getAiSummary() != null && !summary.getAiSummary().isBlank()) {
-            summaryParagraph.setText(summary.getAiSummary());
-        } else {
-            summaryParagraph.setText("Tidak ada aktivitas kunjungan mencurigakan terpantau hari ini. Sistem dalam kondisi aman.");
-        }
     }
 
     // Helper untuk membuat box metrik angka yang seragam

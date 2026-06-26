@@ -136,7 +136,6 @@ public class VisitorManagementService {
             .greenCount(green)
             .yellowCount(yellow)
             .redCount(red)
-            .aiSummary(visitorRiskService.buildAiSummary(todayLogs.size(), inside, green, yellow, red))
             .build();
     }
 

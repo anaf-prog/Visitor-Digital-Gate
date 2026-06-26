@@ -196,24 +196,5 @@ public class VisitorRiskService {
     private String buildFallbackReason(int frequencyScore, int hourScore) {
         return "Frekuensi kunjungan 7 hari terakhir: +" + frequencyScore + " | Skor jam kunjungan: +" + hourScore;
     }
-
-    /**
-     * Membuat narasi ringkasan aktivitas kunjungan harian untuk ditampilkan di dashboard.
-     * 
-     * @param total Total kunjungan hari ini
-     * @param inside Jumlah pengunjung yang belum checkout
-     * @param green Jumlah kunjungan risiko rendah
-     * @param yellow Jumlah kunjungan risiko sedang
-     * @param red Jumlah kunjungan risiko tinggi
-     */
-    public String buildAiSummary(int total, int inside, int green, int yellow, int red) {
-        if (total == 0) {
-            return "Tidak ada kunjungan hari ini. Area berada dalam kondisi aman.";
-        }
-        return String.format("Hari ini terdapat %d kunjungan, %d tamu masih berada di area. " +
-                "Distribusi risiko: %d hijau, %d kuning, %d merah. " +
-                "Fokus pengawasan disarankan pada tamu berisiko merah.", 
-                total, inside, green, yellow, red);
-    }
     
 }
