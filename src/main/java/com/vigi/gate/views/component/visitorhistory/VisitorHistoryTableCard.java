@@ -7,6 +7,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
@@ -39,9 +40,25 @@ public class VisitorHistoryTableCard extends BaseCard {
         this.visitorManagementService = visitorManagementService;
         this.vistorHistoryView = vistorHistoryView;
 
+        // Menerapkan gaya dark mode pada Card Container utama
+        this.getStyle()
+            .set("background-color", "#111827")
+            .set("padding", "20px")
+            .set("border-radius", "12px")
+            .set("border", "1px solid rgba(255, 255, 255, 0.08)")
+            .set("--lumo-base-color", "#111827")          // Latar belakang tabel & header
+            .set("--lumo-body-text-color", "#f3f4f6")     // Teks isi tabel
+            .set("--lumo-secondary-text-color", "#9ca3af")// Teks header tabel
+            .set("--lumo-contrast-10pct", "rgba(255, 255, 255, 0.04)") // Garis baris (zebra striping)
+            .set("--lumo-contrast-20pct", "rgba(255, 255, 255, 0.1)");  // Garis batas sel tabel
+
         H3 tableTitle = new H3("Data Visitor");
-        tableTitle.getStyle().set("margin", "0");
-        recordCountLabel.getStyle().set("color", "#6b7280").set("font-weight", "500");
+        tableTitle.getStyle()
+            .set("margin", "0")
+            .set("color", "#00ff66")
+            .set("text-shadow", "0 0 8px rgba(0, 255, 102, 0.3)");
+
+        recordCountLabel.getStyle().set("color", "#9ca3af").set("font-weight", "500");
 
         HorizontalLayout topActions = new HorizontalLayout(tableTitle, recordCountLabel);
         topActions.setWidthFull();
@@ -51,6 +68,13 @@ public class VisitorHistoryTableCard extends BaseCard {
 
         // Sambungkan komponen grid tabel ke objek data provider bersama yang dikelola kelas induk
         grid.setDataProvider(dataProvider);
+
+        grid.getStyle()
+            .set("background-color", "#111827")
+            .set("border", "1px solid rgba(255, 255, 255, 0.08)")
+            .set("border-radius", "8px");
+
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_ROW_STRIPES);
 
         // Konfigurasi Kolom Grid
         grid.addColumn(VisitorLogResponse::getFullName).setHeader("Nama").setSortable(true).setAutoWidth(true);
@@ -64,14 +88,15 @@ public class VisitorHistoryTableCard extends BaseCard {
         grid.addColumn(new ComponentRenderer<Span, VisitorLogResponse>(res -> {
             RiskLevel level = res.getRiskLevel() != null ? res.getRiskLevel() : RiskLevel.GREEN;
             Span badge = new Span(level.name());
-            badge.getStyle().set("font-weight", "700");
+            badge.getStyle().set("font-weight", "800");
             
+            // Konfigurasi warna teks badge resiko yang adaptif di layar gelap
             if (RiskLevel.RED.equals(level)) {
-                badge.getStyle().set("color", "#dc2626");
+                badge.getStyle().set("color", "#f87171").set("text-shadow", "0 0 6px rgba(248, 113, 113, 0.4)");
             } else if (RiskLevel.YELLOW.equals(level)) {
-                badge.getStyle().set("color", "#d97706");
+                badge.getStyle().set("color", "#fbbf24").set("text-shadow", "0 0 6px rgba(251, 191, 36, 0.4)");
             } else {
-                badge.getStyle().set("color", "#166534");
+                badge.getStyle().set("color", "#34d399").set("text-shadow", "0 0 6px rgba(52, 211, 153, 0.4)");
             }
             return badge;
         })).setHeader("Risk").setSortable(true).setAutoWidth(true);
@@ -86,7 +111,8 @@ public class VisitorHistoryTableCard extends BaseCard {
                 imgPreview.setWidth("40px");
                 imgPreview.setHeight("40px");
                 imgPreview.getStyle()
-                    .set("border-radius", "4px")
+                    .set("border-radius", "6px")
+                    .set("border", "1px solid rgba(0, 255, 102, 0.3)")
                     .set("object-fit", "cover")
                     .set("cursor", "pointer")
                     .set("transition", "transform 0.2s");
@@ -94,7 +120,7 @@ public class VisitorHistoryTableCard extends BaseCard {
                 return imgPreview;
             } else {
                 Span noPhotoSpan = new Span("Tidak ada");
-                noPhotoSpan.getStyle().set("color", "#9ca3af").set("font-size", "12px");
+                noPhotoSpan.getStyle().set("color", "#6b7280").set("font-size", "12px");
                 return noPhotoSpan;
             }
         })).setHeader("Foto").setAutoWidth(true);
@@ -103,7 +129,30 @@ public class VisitorHistoryTableCard extends BaseCard {
         grid.addColumn(new ComponentRenderer<>(res -> {
             Button deleteBtn = new Button("Hapus");
             deleteBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
-            deleteBtn.getStyle().set("background-color", "#dc2626").set("color", "white");
+ 
+            deleteBtn.getStyle()
+                .set("background-color", "rgba(239, 68, 68, 0.15)") // Warna dasar merah redup transparan
+                .set("color", "#f87171")                             // Warna teks merah soft
+                .set("border", "1px solid rgba(239, 68, 68, 0.4)")  // Border merah tipis
+                .set("font-weight", "600")
+                .set("cursor", "pointer")
+                .set("transition", "all 0.2s ease-in-out");          // Transisi animasi menyeluruh
+                
+            // Menambahkan efek hover kustom pada tombol Hapus
+            deleteBtn.getElement().addEventListener("mouseover", e -> {
+                deleteBtn.getStyle()
+                    .set("background-color", "#ef4444")
+                    .set("color", "#ffffff")
+                    .set("box-shadow", "0 0 10px rgba(239, 68, 68, 0.45)");
+            });
+            
+            deleteBtn.getElement().addEventListener("mouseout", e -> {
+                deleteBtn.getStyle()
+                    .set("background-color", "rgba(239, 68, 68, 0.15)")
+                    .set("color", "#f87171")
+                    .remove("box-shadow");
+            });
+
             deleteBtn.addClickListener(e -> showDeleteConfirmation(res));
             
             HorizontalLayout layout = new HorizontalLayout(deleteBtn);
@@ -130,8 +179,16 @@ public class VisitorHistoryTableCard extends BaseCard {
         photoDialog.setCloseOnEsc(true);
         photoDialog.setCloseOnOutsideClick(true);
 
+        photoDialog.getElement().executeJs(
+            "this.$.overlay.$.overlay.style.backgroundColor = '#1e293b';" +
+            "this.$.overlay.$.overlay.style.color = '#f1f5f9';"
+        );
+
         H3 dialogTitle = new H3("Foto Visitor");
-        dialogTitle.getStyle().set("margin-top", "0");
+        dialogTitle.getStyle()
+            .set("margin-top", "0")
+            .set("margin-bottom", "20px")
+            .set("color", "#00ff66");
 
         VerticalLayout photoWrapper = new VerticalLayout();
         photoWrapper.setAlignItems(Alignment.CENTER);
@@ -143,11 +200,12 @@ public class VisitorHistoryTableCard extends BaseCard {
             .set("max-width", "100%")
             .set("max-height", "400px")
             .set("border-radius", "8px")
-            .set("box-shadow", "0 4px 12px rgba(0,0,0,0.2)");
+            .set("box-shadow", "0 4px 12px rgba(0,0,0,0.5)");
         photoWrapper.add(fullImage);
 
         Button closeBtn = new Button("Tutup", event -> photoDialog.close());
         closeBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        closeBtn.getStyle().set("color", "#9ca3af");
 
         HorizontalLayout footer = new HorizontalLayout(closeBtn);
         footer.setWidthFull();
@@ -163,12 +221,19 @@ public class VisitorHistoryTableCard extends BaseCard {
         confirmDialog.setCloseOnEsc(true);
         confirmDialog.setCloseOnOutsideClick(true);
 
+        confirmDialog.getElement().executeJs(
+            "this.$.overlay.$.overlay.style.backgroundColor = '#1e293b';" +
+            "this.$.overlay.$.overlay.style.color = '#f1f5f9';"
+        );
+
         H3 dialogTitle = new H3("Konfirmasi Hapus Data");
-        dialogTitle.getStyle().set("margin-top", "0");
+        dialogTitle.getStyle().set("margin-top", "0").set("color", "#f87171");
 
         Paragraph bodyText = new Paragraph("Apakah Anda yakin ingin menghapus data visitor " + res.getFullName() + "?");
+        bodyText.getStyle().set("color", "#9ca3af"); 
+
         Paragraph warningText = new Paragraph("Tindakan ini tidak dapat dibatalkan.");
-        warningText.getStyle().set("color", "#dc2626").set("font-weight", "700").set("font-size", "13px");
+        warningText.getStyle().set("color", "#f87171").set("font-weight", "700").set("font-size", "13px");
 
         Button confirmBtn = new Button("Hapus", event -> {
             try {
@@ -177,7 +242,6 @@ public class VisitorHistoryTableCard extends BaseCard {
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 confirmDialog.close();
                 
-                // Minta view induk untuk memuat ulang data terbaru dari service database
                 vistorHistoryView.refreshHistoryData();
             } catch (Exception ex) {
                 Notification.show("Gagal menghapus data visitor.", 5000, Notification.Position.TOP_CENTER)
@@ -187,8 +251,15 @@ public class VisitorHistoryTableCard extends BaseCard {
         });
         confirmBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
 
+        confirmBtn.getStyle().set("transition", "background-color 0.2s");
+        confirmBtn.getElement().addEventListener("mouseover", e -> confirmBtn.getStyle().set("background-color", "#dc2626"));
+        confirmBtn.getElement().addEventListener("mouseout", e -> confirmBtn.getStyle().set("background-color", ""));
+
         Button cancelBtn = new Button("Batal", event -> confirmDialog.close());
         cancelBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        cancelBtn.getStyle().set("color", "#9ca3af").set("transition", "color 0.2s");
+        cancelBtn.getElement().addEventListener("mouseover", e -> cancelBtn.getStyle().set("color", "#ffffff"));
+        cancelBtn.getElement().addEventListener("mouseout", e -> cancelBtn.getStyle().set("color", "#9ca3af"));
 
         HorizontalLayout footerLayout = new HorizontalLayout(cancelBtn, confirmBtn);
         footerLayout.setWidthFull();

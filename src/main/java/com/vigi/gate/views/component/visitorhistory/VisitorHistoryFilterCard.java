@@ -30,8 +30,30 @@ public class VisitorHistoryFilterCard extends BaseCard {
         this.dataProvider = dataProvider;
         this.vistorHistoryView = vistorHistoryView;
 
+        // Menerapkan CSS Custom Properties Lumo pada Card Container agar mendukung Dark Mode
+        this.getStyle()
+            .set("background-color", "#111827") // Latar belakang card (Dark Gray/Blue)
+            .set("padding", "20px")
+            .set("border-radius", "12px")
+            .set("border", "1px solid rgba(255, 255, 255, 0.08)")
+            // Mengatur warna teks input menjadi putih/terang
+            .set("--lumo-body-text-color", "#f3f4f6") 
+            // Mengatur warna label ("Nama", "NIK", dll) menjadi abu-abu terang agar kontras
+            .set("--lumo-secondary-text-color", "#9ca3af") 
+            // Mengatur latar belakang kolom input (contrast-10pct)
+            .set("--lumo-contrast-10pct", "rgba(255, 255, 255, 0.07)") 
+            // Mengatur warna border kolom input saat hover/fokus (contrast-20pct)
+            .set("--lumo-contrast-20pct", "rgba(255, 255, 255, 0.15)")
+            .set("--lumo-contrast-30pct", "rgba(255, 255, 255, 0.25)")
+            // Mengatur warna fokus/kursor (warna hijau sesuai tema Anda)
+            .set("--lumo-primary-color", "#00cc66")
+            .set("--lumo-primary-text-color", "#00cc66");
+
         H3 filterTitle = new H3("Filter Data");
-        filterTitle.getStyle().set("margin-top", "0");
+        filterTitle.getStyle()
+            .set("margin-top", "0")
+            .set("color", "#00ff66")
+            .set("text-shadow", "0 0 8px rgba(0, 255, 102, 0.3)");
         add(filterTitle);
 
         filterNama.setPlaceholder("Cari berdasarkan nama");
@@ -40,13 +62,19 @@ public class VisitorHistoryFilterCard extends BaseCard {
         filterCheckin.setPlaceholder("HH:MM");
         filterCheckin.setClearButtonVisible(true);
 
-        // Aksi Tombol Terapkan dan Hapus Filter
+        // Aksi Tombol Terapkan dan Hapus Filter dengan styling kontras dark mode
         Button applyFilterBtn = new Button("Terapkan Filter", event -> applyDataFilters());
-        applyFilterBtn.getStyle().set("background-color", "#2563eb").set("color", "#fff");
+        applyFilterBtn.getStyle()
+            .set("background-color", "#00cc66")
+            .set("color", "#090d16")
+            .set("font-weight", "700");
         
         Button clearFilterBtn = new Button("Hapus Filter", event -> clearDataFilters());
         clearFilterBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        clearFilterBtn.getStyle().set("background-color", "#f3f4f6").set("color", "#374151").set("border", "1px solid #d1d5db");
+        clearFilterBtn.getStyle()
+            .set("background-color", "#1e293b")
+            .set("color", "#f3f4f6")
+            .set("border", "1px solid rgba(255, 255, 255, 0.1)");
 
         HorizontalLayout filterActions = new HorizontalLayout(applyFilterBtn, clearFilterBtn);
         filterActions.getStyle().set("margin-top", "auto");

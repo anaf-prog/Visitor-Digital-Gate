@@ -1,7 +1,11 @@
 package com.vigi.gate.views;
 
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -32,26 +36,98 @@ public class RiskruleView extends VerticalLayout {
         setPadding(true);
         setSpacing(true);
         // Mengubah warna background utama menjadi gelap pekat sesuai tema
-        getStyle().set("background-color", "#090d16");
+        getStyle().set("padding", "24px")
+            .set("background-color", "#090d16");
 
-        // HEADER
-        H1 title = new H1("Risk Rule Management");
-        title.getStyle().set("margin", "0").set("color", "#f3f4f6");
-        Anchor backToDashboard = new Anchor("", "Kembali ke Dashboard");
-        // Memberikan style hijau menyala pada tombol navigasi kembali
-        backToDashboard.getStyle()
+        // --- PEMBUATAN HEADER / NAVBAR MODERN (Sama seperti Dashboard) ---
+        HorizontalLayout navbar = new HorizontalLayout();
+        navbar.setWidthFull();
+        navbar.setPadding(false);
+        navbar.setSpacing(true);
+        navbar.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        navbar.setAlignItems(Alignment.CENTER);
+        
+        navbar.getStyle()
+            .set("background-color", "#111827")
+            .set("box-shadow", "0 0 15px rgba(0, 255, 102, 0.05)")
+            .set("border", "1px solid rgba(0, 255, 102, 0.15)")
+            .set("border-radius", "12px")
+            .set("padding", "16px 24px");
+
+        // Bagian Kiri Navbar: Logo / Judul Utama
+        H2 brandTitle = new H2("Vigi Gate");
+        brandTitle.getStyle()
+            .set("margin", "0")
+            .set("font-size", "24px")
+            .set("font-weight", "900")
             .set("color", "#00ff66")
+            .set("text-shadow", "0 0 10px rgba(0, 255, 102, 0.4)")
+            .set("letter-spacing", "0.5px");
+        
+        Span brandSub = new Span("Risk Rule Management");
+        brandSub.getStyle()
+            .set("font-size", "14px")
+            .set("font-weight", "600")
+            .set("color", "#9ca3af")
+            .set("margin-left", "12px")
+            .set("border-left", "2px solid rgba(0, 255, 102, 0.3)")
+            .set("padding-left", "12px");
+
+        HorizontalLayout brandLayout = new HorizontalLayout(brandTitle, brandSub);
+        brandLayout.setAlignItems(Alignment.CENTER);
+
+        // Bagian Kanan Navbar: Menu Navigasi dengan Efek Hover
+        Button backToDashboardBtn = new Button("Kembali ke Dashboard", VaadinIcon.HOME.create(), event -> {
+            UI.getCurrent().navigate("");
+        });
+        backToDashboardBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        backToDashboardBtn.getStyle()
+            .set("background-color", "#00cc66")
+            .set("color", "#090d16")
             .set("font-weight", "700")
-            .set("text-decoration", "none")
-            .set("text-shadow", "0 0 8px rgba(0, 255, 102, 0.4)");
+            .set("cursor", "pointer")
+            .set("transition", "all 0.2s ease-in-out");
+        
+        backToDashboardBtn.getElement().addEventListener("mouseover", e -> {
+            backToDashboardBtn.getStyle().set("background-color", "#00ff66");
+            backToDashboardBtn.getStyle().set("box-shadow", "0 0 15px rgba(0, 255, 102, 0.6)");
+        });
+        backToDashboardBtn.getElement().addEventListener("mouseout", e -> {
+            backToDashboardBtn.getStyle().set("background-color", "#00cc66");
+            backToDashboardBtn.getStyle().remove("box-shadow");
+        });
 
-        HorizontalLayout headerLayout = new HorizontalLayout(title, backToDashboard);
-        headerLayout.setWidthFull();
-        headerLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        headerLayout.setAlignItems(Alignment.CENTER);
-        add(headerLayout);
+        Button historyBtn = new Button("Riwayat 30 Hari", VaadinIcon.TIME_BACKWARD.create(), event -> {
+            UI.getCurrent().navigate("visitor-history");
+        });
+        historyBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        // Mengubah style tombol ke glow in the dark green
+        historyBtn.getStyle()
+            .set("background-color", "#00cc66")
+            .set("color", "#090d16")
+            .set("font-weight", "700")
+            .set("cursor", "pointer")
+            .set("transition", "all 0.2s ease-in-out");
 
-        // Struktur Grid Halaman
+        historyBtn.getElement().addEventListener("mouseover", e -> {
+            historyBtn.getStyle().set("background-color", "#00ff66");
+            historyBtn.getStyle().set("box-shadow", "0 0 15px rgba(0, 255, 102, 0.6)");
+        });
+        historyBtn.getElement().addEventListener("mouseout", e -> {
+            historyBtn.getStyle().set("background-color", "#00cc66");
+            historyBtn.getStyle().remove("box-shadow");
+        });
+
+        HorizontalLayout menuLayout = new HorizontalLayout(backToDashboardBtn, historyBtn);
+        menuLayout.setSpacing(true);
+
+        // Gabungkan komponen ke Navbar
+        navbar.add(brandLayout, menuLayout);
+        
+        // Tambahkan Navbar ke layout paling atas
+        add(navbar);
+
+        // Struktur Grid Halaman Konten di bawah navbar
         HorizontalLayout mainContentLayout = new HorizontalLayout();
         mainContentLayout.setSizeFull();
         mainContentLayout.setSpacing(true);
