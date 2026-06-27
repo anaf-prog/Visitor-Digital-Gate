@@ -38,25 +38,26 @@ public class VisitorManagementService {
 
     @Transactional
     public VisitorLogResponse registerVisitor(VisitorRegistrationRequest request, MultipartFile photo) {
-        String photoUrl = request.getPhoto();
-        
-        if (photo != null && !photo.isEmpty()) {
-            Map<String, String> uploadResult = cloudinaryService.uploadImage(photo, "visitor_photos");
-            if (uploadResult != null) {
-                photoUrl = uploadResult.get("url");
-                log.info("Foto berhasil diupload: {}", photoUrl);
-            } else {
-                log.warn("Gagal upload foto, melanjutkan tanpa foto");
-            }
-        }
-        
-        // Simpan visitor dengan URL foto
+        // Cari visitor 
         Visitor visitor = visitorRepository.findByNik(request.getNik()).orElseGet(Visitor::new);
         
         visitor.setNik(request.getNik());
         visitor.setFullName(request.getFullName());
-        visitor.setPhoto(photoUrl);
-        log.debug("Sebelum save - Photo URL yang akan disimpan: {}", photoUrl);
+        
+        // Update foto hanya jika ada file baru atau request foto baru yang dikirimkan
+        if (photo != null && !photo.isEmpty()) {
+            Map<String, String> uploadResult = cloudinaryService.uploadImage(photo, "visitor_photos");
+            if (uploadResult != null) {
+                visitor.setPhoto(uploadResult.get("url"));
+                log.info("Foto berhasil diupload: {}", visitor.getPhoto());
+            } else {
+                log.warn("Gagal upload foto, melanjutkan tanpa foto baru");
+            }
+        } else if (request.getPhoto() != null && !request.getPhoto().trim().isEmpty()) {
+            visitor.setPhoto(request.getPhoto());
+        }
+        
+        log.debug("Sebelum save - Photo URL yang akan disimpan: {}", visitor.getPhoto());
         
         Visitor savedVisitor = visitorRepository.save(visitor);
         
