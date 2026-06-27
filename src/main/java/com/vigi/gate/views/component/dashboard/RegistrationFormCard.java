@@ -56,6 +56,8 @@ public class RegistrationFormCard extends BaseCard {
 
         photoUpload.setAcceptedFileTypes("image/*");
         photoUpload.setMaxFiles(1);
+        photoUpload.setWidthFull();
+        photoUpload.setDropAllowed(true);
         
         Div uploadLabel = new Div(new Span("Foto"));
         uploadLabel.getStyle().set("font-size", "14px").set("font-weight", "600").set("margin-top", "10px");

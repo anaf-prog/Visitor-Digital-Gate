@@ -41,9 +41,8 @@ public class MainView extends VerticalLayout {
     @PostConstruct
     public void init() {
         addClassName("main-view-container");
-        setSizeFull();
-        setHeight("auto");
-        getStyle().set("min-height", "100vh");
+        setWidthFull();
+        setMinHeight("100vh"); 
         
         setPadding(true); 
         getStyle().set("padding", "24px");
