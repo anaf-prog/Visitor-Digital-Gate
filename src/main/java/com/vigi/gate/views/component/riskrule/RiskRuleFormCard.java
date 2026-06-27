@@ -51,8 +51,22 @@ public class RiskRuleFormCard extends BaseCard {
         this.riskRuleService = riskRuleService;
         this.riskruleView = riskruleView;
 
-        formTitle.getStyle().set("margin-top", "0").set("color", "#00ff66").set("text-shadow", "0 0 8px rgba(0,255,102,0.3)");
+        // 1. Mengatur jarak judul (H3) agar tidak menyisakan ruang kosong yang terlalu besar
+        formTitle.getStyle()
+            .set("margin-top", "0")
+            .set("margin-bottom", "6px")
+            .set("color", "#00ff66")
+            .set("text-shadow", "0 0 8px rgba(0,255,102,0.3)")
+            .set("font-size", "20px"); // Sedikit memperkecil ukuran font judul
         add(formTitle);
+
+        // 2. Memastikan scrollbar mati total secara absolut
+        getStyle()
+            .set("overflow", "hidden")
+            .set("display", "flex")
+            .set("flex-direction", "column")
+            .set("gap", "8px") // Mengatur jarak antar-layout utama di dalam kartu
+            .set("padding", "16px"); // Sedikit mengurangi padding internal kartu agar lebih luas
 
         // Menerapkan gaya dark mode pada masing-masing field input
         applyFieldDarkModeStyles(ruleName);
@@ -85,7 +99,7 @@ public class RiskRuleFormCard extends BaseCard {
 
         HorizontalLayout checkboxRow = new HorizontalLayout(active);
         checkboxRow.setPadding(false);
-        checkboxRow.getStyle().set("margin-top", "10px");
+        checkboxRow.getStyle().set("margin-top", "2px"); // Mempersempit jarak atas checkbox
 
         // Pemetaan properti form DTO
         binder.forField(ruleName).bind("ruleName");
@@ -96,24 +110,31 @@ public class RiskRuleFormCard extends BaseCard {
         binder.forField(active).bind("active");
 
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        // Mengubah warna tombol simpan ke Glow Green
         saveButton.getStyle()
             .set("background-color", "#00cc66")
             .set("color", "#090d16")
-            .set("font-weight", "700");
+            .set("font-weight", "700")
+            .set("font-size", "14px"); // Ukuran tombol disesuaikan
         saveButton.addClickListener(event -> handleSave());
 
         cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         cancelButton.setVisible(false);
-        cancelButton.getStyle().set("color", "#9ca3af");
+        cancelButton.getStyle()
+            .set("color", "#9ca3af")
+            .set("font-size", "14px");
         cancelButton.addClickListener(event -> resetForm());
 
         HorizontalLayout buttonRow = new HorizontalLayout(saveButton, cancelButton);
         buttonRow.setSpacing(true);
-        buttonRow.getStyle().set("margin-top", "14px");
+        buttonRow.getStyle().set("margin-top", "4px"); // Mempersempit jarak atas tombol
 
         FormLayout formFieldsLayout = new FormLayout(ruleName, conditionType, conditionValue, riskLevel, scoreContribution);
         formFieldsLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
+        
+        // 3. Merapatkan sela antar-baris form fields menggunakan variabel css Vaadin
+        formFieldsLayout.getStyle()
+            .set("--vaadin-form-layout-row-spacing", "4px")
+            .set("gap", "4px"); 
         
         add(formFieldsLayout, checkboxRow, buttonRow);
 
@@ -123,16 +144,25 @@ public class RiskRuleFormCard extends BaseCard {
 
     /**
      * Mengatur style CSS variabel Lumo agar kolom input, label, 
-     * dan batas formulir terlihat jelas di dark mode.
+     * dan batas formulir terlihat jelas di dark mode dengan ukuran ringkas.
      */
     private void applyFieldDarkModeStyles(com.vaadin.flow.component.HasStyle field) {
+        // Menggunakan tema "small" bawaan Vaadin untuk memperkecil tinggi input field secara seragam
+        if (field instanceof com.vaadin.flow.component.HasTheme) {
+            ((com.vaadin.flow.component.HasTheme) field).addThemeName("small");
+        }
+
         field.getStyle()
             .set("--lumo-body-text-color", "#ffffff")         // Warna teks di dalam kolom input
             .set("--lumo-secondary-text-color", "#ffffff")    // Mengubah warna tulisan label di atas menjadi PUTIH
             .set("--lumo-primary-text-color", "#00cc66")
             .set("--lumo-contrast-10pct", "#1e293b")          // Warna latar belakang kolom form (Slate 800)
             .set("--lumo-contrast-20pct", "#475569")          // Warna batas / border kolom form (Slate 600)
-            .set("--lumo-primary-color", "#00cc66");          // Warna indikator fokus saat kolom dipilih
+            .set("--lumo-primary-color", "#00cc66")           // Warna indikator fokus saat kolom dipilih
+            
+            // Mengurangi ukuran font label dan padding internal kolom Lumo Form
+            .set("--lumo-font-size-s", "14px")
+            .set("margin-bottom", "0px"); 
     }
 
     /**

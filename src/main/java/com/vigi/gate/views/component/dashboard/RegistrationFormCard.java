@@ -44,6 +44,21 @@ public class RegistrationFormCard extends BaseCard {
         // Mengaktifkan tema gelap untuk card ini beserta komponen di dalamnya
         getElement().setAttribute("theme", "dark");
 
+       getElement().executeJs(
+            "setTimeout(() => {" +
+            "  const titleEl = this.shadowRoot ? this.shadowRoot.querySelector('[slot=\"title\"], h3, h2, .card-title') : null;" +
+            "  if(titleEl) { " +
+            "    titleEl.style.color = '#00ff66';" +
+            "    titleEl.style.textShadow = '0 0 8px rgba(0,255,102,0.3)';" +
+            "  } else {" +
+            "    this.querySelectorAll('[slot=\"title\"], h3, h2').forEach(el => {" +
+            "       el.style.color = '#00ff66';" +
+            "       el.style.textShadow = '0 0 8px rgba(0,255,102,0.3)';" +
+            "    });" +
+            "  }" +
+            "}, 50);"
+        );
+
         // Styling Card Container utama agar serasi dengan dashboard
         getStyle()
             .set("background-color", "#111827")
@@ -98,6 +113,7 @@ public class RegistrationFormCard extends BaseCard {
             .set("margin-top", "8px")
             .set("margin-bottom", "16px")
             .set("--lumo-body-text-color", "#f3f4f6")
+            .set("--lumo-primary-text-color", "#00cc66")
             .set("--lumo-secondary-text-color", "#9ca3af");
         
         Div uploadLabel = new Div(new Span("Foto"));
@@ -105,7 +121,7 @@ public class RegistrationFormCard extends BaseCard {
             .set("font-size", "14px")
             .set("font-weight", "600")
             .set("margin-top", "10px")
-            .set("color", "#00ff66") // Label Foto menggunakan warna Glow Green
+            .set("color", "#ffffff") // Label Foto
             .set("text-shadow", "0 0 5px rgba(0, 255, 102, 0.2)");
         
         // Konfigurasi Tombol Submit
@@ -140,8 +156,8 @@ public class RegistrationFormCard extends BaseCard {
     private void configureDarkField(com.vaadin.flow.component.HasStyle field) {
         field.getStyle()
             .set("--lumo-body-text-color", "#f3f4f6")        // Warna teks input (terang)
-            .set("--lumo-secondary-text-color", "#00ff66")   // Warna label (glow green)
-            .set("--lumo-primary-color", "#00ff66")          // Warna outline saat fokus (glow)
+            .set("--lumo-secondary-text-color", "#ffffff")   // Warna label
+            .set("--lumo-primary-text-color", "#00cc66")          // Warna outline saat fokus (glow)
             .set("--lumo-contrast-10pct", "rgba(255, 255, 255, 0.05)") // Background input field
             .set("margin-bottom", "12px");
     }

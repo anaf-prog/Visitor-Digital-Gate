@@ -42,7 +42,7 @@ public class ActiveVisitorsCard extends BaseCard {
             .set("color", "#f3f4f6");
 
         H3 activeHeaderTitle = new H3("Realtime Log - Active Visitors");
-        activeHeaderTitle.getStyle().set("margin", "0").set("color", "#f3f4f6");
+        activeHeaderTitle.getStyle().set("margin", "0").set("color", "#00ff66");
         
         Button refreshActiveBtn = new Button("Refresh", event -> refreshActiveData());
         refreshActiveBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);

@@ -31,13 +31,18 @@ public class RiskruleView extends VerticalLayout {
 
     @PostConstruct
     public void init() {
-        // Set Aturan Tampilan Utama Halaman
-        setSizeFull();
-        setPadding(true);
+        // 1. Set Aturan Tampilan Utama Halaman (Gunakan setHeightFull bukan setSizeFull agar terkontrol)
+        setHeightFull();
+        setWidthFull();
+        setPadding(false); // Matikan padding bawaan Vaadin agar tidak tabrakan dengan CSS kustom
         setSpacing(true);
-        // Mengubah warna background utama menjadi gelap pekat sesuai tema
-        getStyle().set("padding", "24px")
-            .set("background-color", "#090d16");
+        
+        // Mengubah warna background utama menjadi gelap pekat sesuai tema diseluruh area viewport
+        getStyle()
+            .set("padding", "24px")
+            .set("background-color", "#090d16")
+            .set("box-sizing", "border-box")
+            .set("overflow", "hidden"); // Mencegah scrollbar utama browser muncul
 
         // --- PEMBUATAN HEADER / NAVBAR MODERN (Sama seperti Dashboard) ---
         HorizontalLayout navbar = new HorizontalLayout();
@@ -101,7 +106,6 @@ public class RiskruleView extends VerticalLayout {
             UI.getCurrent().navigate("visitor-history");
         });
         historyBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        // Mengubah style tombol ke glow in the dark green
         historyBtn.getStyle()
             .set("background-color", "#00cc66")
             .set("color", "#090d16")
@@ -129,8 +133,15 @@ public class RiskruleView extends VerticalLayout {
 
         // Struktur Grid Halaman Konten di bawah navbar
         HorizontalLayout mainContentLayout = new HorizontalLayout();
-        mainContentLayout.setSizeFull();
+        mainContentLayout.setWidthFull();
+        // Menggunakan setFlexGrow agar layout konten otomatis mengisi sisa area tinggi layar tanpa merusak proporsi
+        setFlexGrow(1.0, mainContentLayout); 
         mainContentLayout.setSpacing(true);
+        
+        // Memaksa background kontainer konten ikut gelap agar sela-sela putih hilang total
+        mainContentLayout.getStyle()
+            .set("background-color", "#090d16")
+            .set("min-height", "0"); // Penting di CSS Flexbox untuk mencegah layout anak memaksa tinggi melebihi parent
 
         // Inisialisasi Sub-Komponen Mandiri
         formCard = new RiskRuleFormCard(riskRuleService, this);
@@ -139,6 +150,10 @@ public class RiskruleView extends VerticalLayout {
         // Set ukuran lebar sub-komponen sesuai desain awal
         formCard.setWidth("35%");
         tableCard.setWidth("65%");
+        
+        // Mengunci tinggi card agar menyesuaikan diri dengan rapi di dalam container utama
+        formCard.setHeightFull();
+        tableCard.setHeightFull();
 
         mainContentLayout.add(formCard, tableCard);
         add(mainContentLayout);

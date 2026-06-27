@@ -29,7 +29,7 @@ public class SummaryReportCard extends BaseCard {
 
         // --- HEADER LAYOUT ---
         H3 summaryHeaderTitle = new H3("Summary Report");
-        summaryHeaderTitle.getStyle().set("margin", "0").set("color", "#f3f4f6");
+        summaryHeaderTitle.getStyle().set("margin", "0").set("color", "#00ff66");
 
         HorizontalLayout summaryHeaderLayout = new HorizontalLayout(summaryHeaderTitle);
         summaryHeaderLayout.setWidthFull();

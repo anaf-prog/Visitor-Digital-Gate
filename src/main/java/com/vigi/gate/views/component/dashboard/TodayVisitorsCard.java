@@ -46,7 +46,7 @@ public class TodayVisitorsCard extends BaseCard {
             .set("color", "#f3f4f6");
 
         H3 todayHeaderTitle = new H3("Data Visitor Hari Ini");
-        todayHeaderTitle.getStyle().set("margin", "0").set("color", "#f3f4f6");
+        todayHeaderTitle.getStyle().set("margin", "0").set("color", "#00ff66");
         
         Button refreshTodayBtn = new Button("Refresh", event -> refreshTodayData());
         refreshTodayBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
