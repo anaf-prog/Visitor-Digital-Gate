@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @PermitAll
 public class RiskruleView extends VerticalLayout {
 
-   private final RiskRuleService riskRuleService;
+    private final RiskRuleService riskRuleService;
 
     // Deklarasi sub-komponen UI yang dipecah
     private RiskRuleFormCard formCard;
@@ -31,13 +31,19 @@ public class RiskruleView extends VerticalLayout {
         setSizeFull();
         setPadding(true);
         setSpacing(true);
-        getStyle().set("background-color", "#f7f8fc");
+        // Mengubah warna background utama menjadi gelap pekat sesuai tema
+        getStyle().set("background-color", "#090d16");
 
         // HEADER
         H1 title = new H1("Risk Rule Management");
-        title.getStyle().set("margin", "0");
+        title.getStyle().set("margin", "0").set("color", "#f3f4f6");
         Anchor backToDashboard = new Anchor("", "Kembali ke Dashboard");
-        backToDashboard.getStyle().set("color", "#2563eb").set("font-weight", "700").set("text-decoration", "none");
+        // Memberikan style hijau menyala pada tombol navigasi kembali
+        backToDashboard.getStyle()
+            .set("color", "#00ff66")
+            .set("font-weight", "700")
+            .set("text-decoration", "none")
+            .set("text-shadow", "0 0 8px rgba(0, 255, 102, 0.4)");
 
         HorizontalLayout headerLayout = new HorizontalLayout(title, backToDashboard);
         headerLayout.setWidthFull();

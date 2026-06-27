@@ -23,11 +23,30 @@ public class RiskRuleTableCard extends BaseCard{
     private final RiskRuleService riskRuleService;
     private final RiskruleView riskruleView;
     private final Grid<RiskRule> grid = new Grid<>(RiskRule.class, false);
+    
+    // Komponen Judul Card Dinamis agar seragam dengan form card
+    private final H3 tableTitle = new H3("Daftar Risk Rule");
 
     public RiskRuleTableCard(RiskRuleService riskRuleService, RiskruleView riskruleView) {
-        super("Daftar Risk Rule"); // Set judul card induk
+        super(""); // Kosongkan karena memakai title dinamis `tableTitle` di bawah
         this.riskRuleService = riskRuleService;
         this.riskruleView = riskruleView;
+
+        // Mengatur gaya visual Judul agar berwarna hijau berpendar
+        tableTitle.getStyle().set("margin-top", "0").set("color", "#00ff66").set("text-shadow", "0 0 8px rgba(0,255,102,0.3)");
+        add(tableTitle);
+
+        // Mengatur gaya visual Grid agar sesuai dengan tema gelap
+        grid.getStyle()
+            .set("background-color", "#0f172a")               // Latar belakang tabel (Slate 900)
+            .set("--lumo-base-color", "#0f172a")              // Latar belakang baris tabel
+            .set("--lumo-body-text-color", "#e2e8f0")         // Warna teks isi tabel (Slate 200)
+            .set("--lumo-header-text-color", "#00ff66")       // Warna teks header tabel (Glow Green)
+            .set("--lumo-contrast-5pct", "rgba(255, 255, 255, 0.03)")  // Latar belakang baris belang (zebra)
+            .set("--lumo-contrast-10pct", "rgba(255, 255, 255, 0.08)") // Efek hover pada baris
+            .set("--lumo-contrast-20pct", "rgba(255, 255, 255, 0.15)") // Warna garis pembatas (border)
+            .set("border", "1px solid rgba(255, 255, 255, 0.1)")       // Garis batas luar tabel
+            .set("border-radius", "8px");
 
         grid.addColumn(RiskRule::getRuleName).setHeader("Rule").setSortable(true);
         grid.addColumn(rule -> rule.getConditionType() + ": " + rule.getConditionValue()).setHeader("Kondisi");
@@ -36,10 +55,16 @@ public class RiskRuleTableCard extends BaseCard{
         
         grid.addColumn(new ComponentRenderer<Span, RiskRule>(rule -> {
             Span statusBadge = new Span(rule.isActive() ? "ACTIVE" : "INACTIVE");
+            // Menyesuaikan warna badge agar lebih ramah dark mode dan berpendar cerah
             if (rule.isActive()) {
-                statusBadge.getStyle().set("color", "#166534").set("font-weight", "700");
+                statusBadge.getStyle()
+                    .set("color", "#34d399")
+                    .set("font-weight", "800")
+                    .set("text-shadow", "0 0 6px rgba(52, 211, 153, 0.4)");
             } else {
-                statusBadge.getStyle().set("color", "#6b7280").set("font-weight", "700");
+                statusBadge.getStyle()
+                    .set("color", "#9ca3af")
+                    .set("font-weight", "700");
             }
             return statusBadge;
         })).setHeader("Status").setAutoWidth(true);
@@ -47,12 +72,41 @@ public class RiskRuleTableCard extends BaseCard{
         grid.addColumn(new ComponentRenderer<>(rule -> {
             Button editBtn = new Button("Edit");
             editBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            editBtn.getStyle().set("background-color", "#d97706").set("color", "#fff");
+            editBtn.getStyle()
+                .set("background-color", "#d97706")
+                .set("color", "#fff")
+                .set("font-weight", "600")
+                .set("transition", "background-color 0.2s ease");
             editBtn.addClickListener(e -> riskruleView.triggerEditMode(rule));
+
+            // Menambahkan efek hover kustom pada tombol Edit via JavaScript Listener
+            editBtn.getElement().addEventListener("mouseover", e -> editBtn.getStyle().set("background-color", "#f59e0b"));
+            editBtn.getElement().addEventListener("mouseout", e -> editBtn.getStyle().set("background-color", "#d97706"));
 
             Button deleteBtn = new Button("Hapus");
             deleteBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+            deleteBtn.getStyle()
+                .set("background-color", "rgba(239, 68, 68, 0.15)") // Warna dasar merah redup transparan
+                .set("color", "#f87171")                            // Warna teks merah soft
+                .set("border", "1px solid rgba(239, 68, 68, 0.4)") // Border merah tipis
+                .set("font-weight", "600")
+                .set("cursor", "pointer")
+                .set("transition", "all 0.2s ease-in-out");
             deleteBtn.addClickListener(e -> showDeleteConfirmation(rule));
+
+            // Menambahkan efek hover kustom pada tombol Hapus agar menyala merah solid
+            deleteBtn.getElement().addEventListener("mouseover", e -> {
+                deleteBtn.getStyle()
+                    .set("background-color", "#ef4444")
+                    .set("color", "#ffffff")
+                    .set("box-shadow", "0 0 10px rgba(239, 68, 68, 0.45)");
+            });
+            deleteBtn.getElement().addEventListener("mouseout", e -> {
+                deleteBtn.getStyle()
+                    .set("background-color", "rgba(239, 68, 68, 0.15)")
+                    .set("color", "#f87171")
+                    .remove("box-shadow");
+            });
 
             HorizontalLayout actions = new HorizontalLayout(editBtn, deleteBtn);
             actions.setSpacing(true);
@@ -73,18 +127,30 @@ public class RiskRuleTableCard extends BaseCard{
         confirmDialog.setCloseOnEsc(true);
         confirmDialog.setCloseOnOutsideClick(true);
 
+        // Menyesuaikan style dialog agar konsisten dengan tema gelap Slate melalui pemanggilan elemen internal overlay
+        confirmDialog.getElement().getStyle()
+            .set("background-color", "#1e293b")
+            .set("color", "#f1f5f9");
+            
+        // Menargetkan bagian overlay part content agar warna dasar putih bawaan Vaadin berubah total jadi gelap
+        confirmDialog.getElement().executeJs(
+            "this.$.overlay.$.overlay.style.backgroundColor = '#1e293b';" +
+            "this.$.overlay.$.overlay.style.color = '#f1f5f9';"
+        );
+
         H3 dialogTitle = new H3("Konfirmasi Hapus");
-        dialogTitle.getStyle().set("margin-top", "0");
+        dialogTitle.getStyle().set("margin-top", "0").set("color", "#ffffff");
         
         Paragraph textInfo = new Paragraph();
+        textInfo.getStyle().set("color", "#cbd5e1");
         textInfo.add("Apakah Anda yakin ingin menghapus risk rule ");
         Span ruleNameHighlight = new Span(rule.getRuleName());
-        ruleNameHighlight.getStyle().set("font-weight", "700");
+        ruleNameHighlight.getStyle().set("font-weight", "700").set("color", "#00ff66");
         textInfo.add(ruleNameHighlight);
         textInfo.add("?");
 
         Paragraph warningText = new Paragraph("Tindakan ini tidak dapat dibatalkan.");
-        warningText.getStyle().set("color", "#dc2626").set("font-weight", "700").set("font-size", "13px");
+        warningText.getStyle().set("color", "#f87171").set("font-weight", "700").set("font-size", "13px");
 
         Button confirmDeleteButton = new Button("Hapus", event -> {
             try {
@@ -103,8 +169,16 @@ public class RiskRuleTableCard extends BaseCard{
         });
         confirmDeleteButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
 
+        // Efek hover untuk tombol konfirmasi hapus di dalam dialog box
+        confirmDeleteButton.getStyle().set("transition", "background-color 0.2s");
+        confirmDeleteButton.getElement().addEventListener("mouseover", e -> confirmDeleteButton.getStyle().set("background-color", "#dc2626"));
+        confirmDeleteButton.getElement().addEventListener("mouseout", e -> confirmDeleteButton.getStyle().set("background-color", ""));
+
         Button cancelDeleteButton = new Button("Batal", event -> confirmDialog.close());
         cancelDeleteButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        cancelDeleteButton.getStyle().set("color", "#9ca3af").set("transition", "color 0.2s");
+        cancelDeleteButton.getElement().addEventListener("mouseover", e -> cancelDeleteButton.getStyle().set("color", "#ffffff"));
+        cancelDeleteButton.getElement().addEventListener("mouseout", e -> cancelDeleteButton.getStyle().set("color", "#9ca3af"));
 
         HorizontalLayout dialogFooter = new HorizontalLayout(cancelDeleteButton, confirmDeleteButton);
         dialogFooter.setJustifyContentMode(JustifyContentMode.END);

@@ -113,7 +113,19 @@ public class TodayVisitorsCard extends BaseCard {
 
             deleteBtn.addClickListener(e -> {
                 Dialog confirmDialog = new Dialog();
-                confirmDialog.getElement().setAttribute("theme", "dark"); // Menyesuaikan tema gelap untuk dialog
+                confirmDialog.setCloseOnEsc(true);
+                confirmDialog.setCloseOnOutsideClick(true);
+                
+                // Menyesuaikan style dasar komponen dialog
+                confirmDialog.getElement().getStyle()
+                    .set("background-color", "#1e293b")
+                    .set("color", "#f1f5f9");
+                
+                // Memaksa sub-elemen overlay web component agar ikut berwarna gelap Slate 800
+                confirmDialog.getElement().executeJs(
+                    "this.$.overlay.$.overlay.style.backgroundColor = '#1e293b';" +
+                    "this.$.overlay.$.overlay.style.color = '#f1f5f9';"
+                );
                 
                 H3 dialogTitle = new H3("Konfirmasi Hapus Data");
                 dialogTitle.getStyle().set("color", "#f3f4f6").set("margin-top", "0");
