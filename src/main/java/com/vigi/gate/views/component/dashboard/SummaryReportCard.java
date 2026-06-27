@@ -12,7 +12,7 @@ import com.vigi.gate.views.component.BaseCard;
 
 public class SummaryReportCard extends BaseCard {
     
-    private final VisitorManagementService visitorManagementService;
+     private final VisitorManagementService visitorManagementService;
     
     // Indikator Utama (Angka Besar)
     private final H4 totalVisitValue = new H4("0");
@@ -29,7 +29,7 @@ public class SummaryReportCard extends BaseCard {
 
         // --- HEADER LAYOUT ---
         H3 summaryHeaderTitle = new H3("Summary Report");
-        summaryHeaderTitle.getStyle().set("margin", "0");
+        summaryHeaderTitle.getStyle().set("margin", "0").set("color", "#f3f4f6");
 
         HorizontalLayout summaryHeaderLayout = new HorizontalLayout(summaryHeaderTitle);
         summaryHeaderLayout.setWidthFull();
@@ -42,30 +42,32 @@ public class SummaryReportCard extends BaseCard {
         metricsGrid.getStyle().set("margin-top", "16px");
 
         // Box 1: Total Kunjungan
-        VerticalLayout totalBox = createMetricBox("Total Kunjungan", totalVisitValue, VaadinIcon.USERS.create(), "#f8fafc");
+        VerticalLayout totalBox = createMetricBox("Total Kunjungan", totalVisitValue, VaadinIcon.USERS.create(), "#1e293b");
         
-        // Box 2: Masih di Area
-        VerticalLayout insideBox = createMetricBox("Masih di Area", insideAreaValue, VaadinIcon.HOME.create(), "#f0fdf4");
-        insideAreaValue.getStyle().set("color", "#15803d");
+        // Box 2: Masih di Area 
+        VerticalLayout insideBox = createMetricBox("Masih di Area", insideAreaValue, VaadinIcon.HOME.create(), "#064e3b");
+        insideAreaValue.getStyle()
+            .set("color", "#00ff66")
+            .set("text-shadow", "0 0 10px rgba(0, 255, 102, 0.5)");
 
         // Box 3: Breakdown Risiko
         VerticalLayout riskBox = new VerticalLayout();
         riskBox.setWidth("34%");
         riskBox.getStyle()
-            .set("background", "#ffa00005")
-            .set("border", "1px solid #e2e8f0")
+            .set("background", "#1e293b")
+            .set("border", "1px solid rgba(255, 255, 255, 0.05)")
             .set("border-radius", "8px")
             .set("padding", "12px")
             .set("box-sizing", "border-box");
         riskBox.setSpacing(false);
         
         Span riskLabel = new Span("Breakdown Risiko");
-        riskLabel.getStyle().set("font-size", "12px").set("color", "#64748b").set("font-weight", "600");
+        riskLabel.getStyle().set("font-size", "12px").set("color", "#9ca3af").set("font-weight", "600");
         
-        // Atur gaya badge risiko dasar
-        styleRiskBadge(greenBadge, "#e6f4ea", "#137333");
-        styleRiskBadge(yellowBadge, "#fef7e0", "#b06000");
-        styleRiskBadge(redBadge, "#fce8e6", "#c5221f");
+        // Atur gaya badge risiko dasar yang harmonis di atas panel gelap
+        styleRiskBadge(greenBadge, "rgba(52, 211, 153, 0.15)", "#34d399");
+        styleRiskBadge(yellowBadge, "rgba(251, 191, 36, 0.15)", "#fbbf24");
+        styleRiskBadge(redBadge, "rgba(248, 113, 113, 0.15)", "#f87171");
 
         HorizontalLayout badgesLayout = new HorizontalLayout(greenBadge, yellowBadge, redBadge);
         badgesLayout.setWidthFull();
@@ -102,20 +104,20 @@ public class SummaryReportCard extends BaseCard {
         box.setWidth("33%");
         box.getStyle()
             .set("background-color", bgColor)
-            .set("border", "1px solid #e2e8f0")
+            .set("border", "1px solid rgba(255, 255, 255, 0.05)")
             .set("border-radius", "8px")
             .set("padding", "12px")
             .set("box-sizing", "border-box");
         box.setSpacing(false);
 
         Span titleLabel = new Span(label);
-        titleLabel.getStyle().set("font-size", "12px").set("color", "#64748b").set("font-weight", "600");
+        titleLabel.getStyle().set("font-size", "12px").set("color", "#9ca3af").set("font-weight", "600");
 
         valueComponent.getStyle()
             .set("margin", "6px 0 0 0")
             .set("font-size", "24px")
             .set("font-weight", "800")
-            .set("color", "#0f172a");
+            .set("color", "#f3f4f6");
 
         HorizontalLayout contentRow = new HorizontalLayout(valueComponent);
         contentRow.setWidthFull();

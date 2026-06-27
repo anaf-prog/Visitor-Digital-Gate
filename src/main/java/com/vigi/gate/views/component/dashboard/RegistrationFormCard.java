@@ -41,35 +41,109 @@ public class RegistrationFormCard extends BaseCard {
         this.visitorManagementService = visitorManagementService;
         this.mainView = mainView;
 
+        // Mengaktifkan tema gelap untuk card ini beserta komponen di dalamnya
+        getElement().setAttribute("theme", "dark");
+
+        // Styling Card Container utama agar serasi dengan dashboard
+        getStyle()
+            .set("background-color", "#111827")
+            .set("border", "1px solid rgba(0, 255, 102, 0.15)")
+            .set("box-shadow", "0 0 15px rgba(0, 255, 102, 0.05)")
+            .set("border-radius", "12px")
+            .set("padding", "20px")
+            .set("color", "#f3f4f6");
+
+        // Konfigurasi Input Fields agar mendukung Dark Mode & Glow Green
         fullNameField.setRequired(true);
         fullNameField.setWidthFull();
+        configureDarkField(fullNameField);
 
         nikField.setRequired(true);
         nikField.setMaxLength(16);
         nikField.setPattern("^\\d{16}$");
         nikField.setAllowedCharPattern("[0-9]");
         nikField.setWidthFull();
+        configureDarkField(nikField);
 
         purposeField.setRequired(true);
         purposeField.setMaxRows(3);
         purposeField.setWidthFull();
+        configureDarkField(purposeField);
 
+        // Konfigurasi Area Upload Gambar
         photoUpload.setAcceptedFileTypes("image/*");
         photoUpload.setMaxFiles(1);
         photoUpload.setWidthFull();
         photoUpload.setDropAllowed(true);
+
+        // Kustomisasi teks dan tombol di dalam area drag-and-drop
+        Span dropLabel = new Span("Drag and Drop Foto ");
+        dropLabel.getStyle().set("color", "#9ca3af");
+
+        Button selectFileButton = new Button("Pilih File");
+        selectFileButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        selectFileButton.getStyle()
+            .set("color", "#00ff66")
+            .set("font-weight", "600");
+
+        photoUpload.setDropLabel(dropLabel);
+        photoUpload.setUploadButton(selectFileButton);
+
+        // Styling container upload
+        photoUpload.getStyle()
+            .set("border", "2px dashed rgba(0, 255, 102, 0.3)")
+            .set("border-radius", "8px")
+            .set("background-color", "rgba(255, 255, 255, 0.02)")
+            .set("padding", "16px")
+            .set("margin-top", "8px")
+            .set("margin-bottom", "16px")
+            .set("--lumo-body-text-color", "#f3f4f6")
+            .set("--lumo-secondary-text-color", "#9ca3af");
         
         Div uploadLabel = new Div(new Span("Foto"));
-        uploadLabel.getStyle().set("font-size", "14px").set("font-weight", "600").set("margin-top", "10px");
+        uploadLabel.getStyle()
+            .set("font-size", "14px")
+            .set("font-weight", "600")
+            .set("margin-top", "10px")
+            .set("color", "#00ff66") // Label Foto menggunakan warna Glow Green
+            .set("text-shadow", "0 0 5px rgba(0, 255, 102, 0.2)");
         
+        // Konfigurasi Tombol Submit
         Button submitButton = new Button("Check-in Tamu", VaadinIcon.SIGN_IN.create());
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         submitButton.setWidthFull();
-        submitButton.getStyle().set("background-color", "#2563eb").set("margin-top", "12px");
+        submitButton.getStyle()
+            .set("background-color", "#00cc66")
+            .set("color", "#090d16")
+            .set("font-weight", "700")
+            .set("margin-top", "16px")
+            .set("box-shadow", "0 0 10px rgba(0, 255, 102, 0.2)")
+            .set("transition", "all 0.2s ease-in-out");
+
+        submitButton.getElement().addEventListener("mouseover", e -> {
+            submitButton.getStyle().set("background-color", "#00ff66");
+            submitButton.getStyle().set("box-shadow", "0 0 15px rgba(0, 255, 102, 0.6)");
+        });
+        submitButton.getElement().addEventListener("mouseout", e -> {
+            submitButton.getStyle().set("background-color", "#00cc66");
+            submitButton.getStyle().set("box-shadow", "0 0 10px rgba(0, 255, 102, 0.2)");
+        });
 
         submitButton.addClickListener(event -> handleFormSubmit());
 
         add(fullNameField, nikField, purposeField, uploadLabel, photoUpload, submitButton);
+    }
+
+    /**
+     * Helper untuk menerapkan properti style Lumo bertema gelap dan glow green pada input field.
+     */
+    private void configureDarkField(com.vaadin.flow.component.HasStyle field) {
+        field.getStyle()
+            .set("--lumo-body-text-color", "#f3f4f6")        // Warna teks input (terang)
+            .set("--lumo-secondary-text-color", "#00ff66")   // Warna label (glow green)
+            .set("--lumo-primary-color", "#00ff66")          // Warna outline saat fokus (glow)
+            .set("--lumo-contrast-10pct", "rgba(255, 255, 255, 0.05)") // Background input field
+            .set("margin-bottom", "12px");
     }
 
     private void handleFormSubmit() {

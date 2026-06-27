@@ -45,7 +45,9 @@ public class MainView extends VerticalLayout {
         setMinHeight("100vh"); 
         
         setPadding(true); 
-        getStyle().set("padding", "24px");
+        // Background utama dark mode menyeluruh
+        getStyle().set("padding", "24px")
+            .set("background-color", "#090d16");
         setSpacing(true);
 
         // --- PEMBUATAN HEADER / NAVBAR MODERN ---
@@ -57,29 +59,30 @@ public class MainView extends VerticalLayout {
         navbar.setAlignItems(Alignment.CENTER);
         
         navbar.getStyle()
-            .set("background-color", "#ffffff")
-            .set("box-shadow", "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)")
-            .set("border", "1px solid #e5e7eb")
-            .set("border-radius", "10px")
-            .set("padding", "12px 24px");
+            .set("background-color", "#111827")
+            .set("box-shadow", "0 0 15px rgba(0, 255, 102, 0.05)")
+            .set("border", "1px solid rgba(0, 255, 102, 0.15)")
+            .set("border-radius", "12px")
+            .set("padding", "16px 24px");
 
         // Bagian Kiri Navbar: Logo / Judul Utama
         H2 brandTitle = new H2("Vigi Gate");
         brandTitle.getStyle()
             .set("margin", "0")
-            .set("font-size", "22px")
-            .set("font-weight", "800")
-            .set("color", "#1e293b")
-            .set("letter-spacing", "-0.025em");
+            .set("font-size", "24px")
+            .set("font-weight", "900")
+            .set("color", "#00ff66")
+            .set("text-shadow", "0 0 10px rgba(0, 255, 102, 0.4)")
+            .set("letter-spacing", "0.5px");
         
         Span brandSub = new Span("Digital Visitor Management");
         brandSub.getStyle()
             .set("font-size", "14px")
-            .set("font-weight", "700")
-            .set("color", "#475569")
-            .set("margin-left", "10px")
-            .set("border-left", "2px solid #cbd5e1")
-            .set("padding-left", "10px");
+            .set("font-weight", "600")
+            .set("color", "#9ca3af")
+            .set("margin-left", "12px")
+            .set("border-left", "2px solid rgba(0, 255, 102, 0.3)")
+            .set("padding-left", "12px");
 
         HorizontalLayout brandLayout = new HorizontalLayout(brandTitle, brandSub);
         brandLayout.setAlignItems(Alignment.CENTER);
@@ -89,30 +92,44 @@ public class MainView extends VerticalLayout {
             UI.getCurrent().navigate("risk-rules");
         });
         riskRulesBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        // Mengubah style tombol ke glow in the dark green
         riskRulesBtn.getStyle()
-            .set("background-color", "#2563eb")
-            .set("color", "#ffffff")
-            .set("font-weight", "600")
+            .set("background-color", "#00cc66")
+            .set("color", "#090d16")
+            .set("font-weight", "700")
             .set("cursor", "pointer")
-            .set("transition", "background-color 0.2s ease-in-out");
+            .set("transition", "all 0.2s ease-in-out");
         
         // Menambahkan efek hover via JavaScript DOM listener internal Vaadin
-        riskRulesBtn.getElement().addEventListener("mouseover", e -> riskRulesBtn.getStyle().set("background-color", "#1d4ed8"));
-        riskRulesBtn.getElement().addEventListener("mouseout", e -> riskRulesBtn.getStyle().set("background-color", "#2563eb"));
+        riskRulesBtn.getElement().addEventListener("mouseover", e -> {
+            riskRulesBtn.getStyle().set("background-color", "#00ff66");
+            riskRulesBtn.getStyle().set("box-shadow", "0 0 15px rgba(0, 255, 102, 0.6)");
+        });
+        riskRulesBtn.getElement().addEventListener("mouseout", e -> {
+            riskRulesBtn.getStyle().set("background-color", "#00cc66");
+            riskRulesBtn.getStyle().remove("box-shadow");
+        });
 
         Button historyBtn = new Button("Riwayat 30 Hari", VaadinIcon.TIME_BACKWARD.create(), event -> {
             UI.getCurrent().navigate("visitor-history");
         });
         historyBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        // Mengubah style tombol ke glow in the dark green
         historyBtn.getStyle()
-            .set("background-color", "#2563eb")
-            .set("color", "#ffffff")
-            .set("font-weight", "600")
+            .set("background-color", "#00cc66")
+            .set("color", "#090d16")
+            .set("font-weight", "700")
             .set("cursor", "pointer")
-            .set("transition", "background-color 0.2s ease-in-out");
+            .set("transition", "all 0.2s ease-in-out");
 
-        historyBtn.getElement().addEventListener("mouseover", e -> historyBtn.getStyle().set("background-color", "#1d4ed8"));
-        historyBtn.getElement().addEventListener("mouseout", e -> historyBtn.getStyle().set("background-color", "#2563eb"));
+        historyBtn.getElement().addEventListener("mouseover", e -> {
+            historyBtn.getStyle().set("background-color", "#00ff66");
+            historyBtn.getStyle().set("box-shadow", "0 0 15px rgba(0, 255, 102, 0.6)");
+        });
+        historyBtn.getElement().addEventListener("mouseout", e -> {
+            historyBtn.getStyle().set("background-color", "#00cc66");
+            historyBtn.getStyle().remove("box-shadow");
+        });
 
         HorizontalLayout menuLayout = new HorizontalLayout(riskRulesBtn, historyBtn);
         menuLayout.setSpacing(true);
