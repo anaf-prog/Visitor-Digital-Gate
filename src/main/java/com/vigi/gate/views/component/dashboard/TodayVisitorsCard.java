@@ -21,6 +21,7 @@ import com.vigi.gate.service.VisitorManagementService;
 import com.vigi.gate.views.MainView;
 import com.vigi.gate.views.component.BaseCard;
 import com.vigi.gate.views.component.GridPagination;
+import com.vigi.gate.views.component.GridSearchFilter;
 
 public class TodayVisitorsCard extends BaseCard {
 
@@ -29,12 +30,25 @@ public class TodayVisitorsCard extends BaseCard {
     private final Grid<VisitorLogResponse> todayGrid = new Grid<>(VisitorLogResponse.class, false);
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private final GridPagination<VisitorLogResponse> pagination;
+    private final GridSearchFilter<VisitorLogResponse> filter;
 
     public TodayVisitorsCard(VisitorManagementService visitorManagementService, MainView mainView) {
         super("");
         this.visitorManagementService = visitorManagementService;
         this.mainView = mainView;
-        this.pagination = new GridPagination<>(todayGrid); // Inisialisasi komponen paginasi
+        this.pagination = new GridPagination<>(todayGrid);
+        
+        // Inisialisasi logika filter pencarian fleksibel
+        this.filter = new GridSearchFilter<>(
+            pagination::setData,
+            (visitor, nameQuery, nikQuery) -> {
+                boolean matchesName = nameQuery.isEmpty() || 
+                    (visitor.getFullName() != null && visitor.getFullName().toLowerCase().contains(nameQuery));
+                boolean matchesNik = nikQuery.isEmpty() || 
+                    (visitor.getNik() != null && visitor.getNik().toLowerCase().contains(nikQuery));
+                return matchesName && matchesNik;
+            }
+        );
 
         getElement().setAttribute("theme", "dark");
 
@@ -48,17 +62,9 @@ public class TodayVisitorsCard extends BaseCard {
 
         H3 todayHeaderTitle = new H3("Data Visitor Hari Ini");
         todayHeaderTitle.getStyle().set("margin", "0").set("color", "#00ff66");
-        
-        Button refreshTodayBtn = new Button("Refresh", event -> refreshTodayData());
-        refreshTodayBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        refreshTodayBtn.getStyle()
-            .set("background-color", "rgba(0, 255, 102, 0.1)")
-            .set("color", "#00ff66")
-            .set("border", "1px solid rgba(0, 255, 102, 0.3)")
-            .set("font-weight", "600")
-            .set("cursor", "pointer");
 
-        HorizontalLayout todayHeaderLayout = new HorizontalLayout(todayHeaderTitle, refreshTodayBtn);
+        // Header Layout menggabungkan Title dan Komponen Filter
+        HorizontalLayout todayHeaderLayout = new HorizontalLayout(todayHeaderTitle, filter.getLayout());
         todayHeaderLayout.setWidthFull();
         todayHeaderLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
         todayHeaderLayout.setAlignItems(Alignment.CENTER);
@@ -155,7 +161,6 @@ public class TodayVisitorsCard extends BaseCard {
 
         todayGrid.setAllRowsVisible(true);
 
-        // Menambahkan layout paginasi tepat di bawah grid
         add(todayHeaderLayout, todayGrid, pagination.getLayout());
     }
 
@@ -192,7 +197,7 @@ public class TodayVisitorsCard extends BaseCard {
 
     public void refreshTodayData() {
         List<VisitorLogResponse> todayLogs = visitorManagementService.getTodayLogs();
-        pagination.setData(todayLogs); // Mengirim data ke komponen paginasi
+        filter.setOriginalData(todayLogs); // Kirim data ke filter untuk diproses
     }
     
 }

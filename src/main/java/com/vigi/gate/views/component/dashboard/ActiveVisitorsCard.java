@@ -18,6 +18,7 @@ import com.vigi.gate.service.VisitorManagementService;
 import com.vigi.gate.views.MainView;
 import com.vigi.gate.views.component.BaseCard;
 import com.vigi.gate.views.component.GridPagination;
+import com.vigi.gate.views.component.GridSearchFilter;
 
 public class ActiveVisitorsCard extends BaseCard {
     
@@ -25,12 +26,25 @@ public class ActiveVisitorsCard extends BaseCard {
     MainView mainView;
     private final Grid<VisitorLogResponse> activeGrid = new Grid<>(VisitorLogResponse.class, false);
     private final GridPagination<VisitorLogResponse> pagination;
+    private final GridSearchFilter<VisitorLogResponse> filter;
 
     public ActiveVisitorsCard(VisitorManagementService visitorManagementService, MainView mainView) {
         super("");
         this.visitorManagementService = visitorManagementService;
         this.mainView = mainView;
-        this.pagination = new GridPagination<>(activeGrid); // Inisialisasi komponen paginasi
+        this.pagination = new GridPagination<>(activeGrid);
+        
+        // Inisialisasi logika filter pencarian fleksibel
+        this.filter = new GridSearchFilter<>(
+            pagination::setData,
+            (visitor, nameQuery, nikQuery) -> {
+                boolean matchesName = nameQuery.isEmpty() || 
+                    (visitor.getFullName() != null && visitor.getFullName().toLowerCase().contains(nameQuery));
+                boolean matchesNik = nikQuery.isEmpty() || 
+                    (visitor.getNik() != null && visitor.getNik().toLowerCase().contains(nikQuery));
+                return matchesName && matchesNik;
+            }
+        );
 
         getElement().setAttribute("theme", "dark");
 
@@ -45,22 +59,13 @@ public class ActiveVisitorsCard extends BaseCard {
         H3 activeHeaderTitle = new H3("Realtime Log - Active Visitors");
         activeHeaderTitle.getStyle().set("margin", "0").set("color", "#00ff66");
         
-        Button refreshActiveBtn = new Button("Refresh", event -> refreshActiveData());
-        refreshActiveBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        refreshActiveBtn.getStyle()
-            .set("background-color", "rgba(0, 255, 102, 0.1)")
-            .set("color", "#00ff66")
-            .set("border", "1px solid rgba(0, 255, 102, 0.3)")
-            .set("font-weight", "600")
-            .set("cursor", "pointer");
-        
-        HorizontalLayout activeHeaderLayout = new HorizontalLayout(activeHeaderTitle, refreshActiveBtn);
+        // Header Layout menggabungkan Title dan Komponen Filter
+        HorizontalLayout activeHeaderLayout = new HorizontalLayout(activeHeaderTitle, filter.getLayout());
         activeHeaderLayout.setWidthFull();
         activeHeaderLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
         activeHeaderLayout.setAlignItems(Alignment.CENTER);
         activeHeaderLayout.getStyle().set("margin-bottom", "16px");
 
-        // Kustomisasi Styling Grid agar menyesuaikan dengan Dark Mode
         activeGrid.getElement().setAttribute("theme", "dark");
         activeGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_ROW_STRIPES);
         
@@ -148,6 +153,6 @@ public class ActiveVisitorsCard extends BaseCard {
 
     public void refreshActiveData() {
         List<VisitorLogResponse> activeVisitors = visitorManagementService.getActiveVisitors();
-        pagination.setData(activeVisitors); // Mengirim data ke komponen paginasi
+        filter.setOriginalData(activeVisitors); // Kirim data ke filter untuk diproses
     }
 }
