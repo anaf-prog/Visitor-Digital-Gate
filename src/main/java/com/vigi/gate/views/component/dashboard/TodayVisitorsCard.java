@@ -1,6 +1,7 @@
 package com.vigi.gate.views.component.dashboard;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.flow.component.button.Button;
@@ -27,6 +28,17 @@ public class TodayVisitorsCard extends BaseCard {
     MainView mainView;
     private final Grid<VisitorLogResponse> todayGrid = new Grid<>(VisitorLogResponse.class, false);
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    // Variabel untuk menyimpan data dan status paginasi hari ini
+    private final List<VisitorLogResponse> allTodayData = new ArrayList<>();
+    private int currentPage = 0;
+    private static final int PAGE_SIZE = 10;
+
+    // Komponen UI Paginasi
+    private final HorizontalLayout paginationLayout = new HorizontalLayout();
+    private final Button prevBtn = new Button("Sebelumnya");
+    private final Button nextBtn = new Button("Berikutnya");
+    private final Span pageInfo = new Span();
 
     public TodayVisitorsCard(VisitorManagementService visitorManagementService, MainView mainView) {
         super("");
@@ -159,7 +171,101 @@ public class TodayVisitorsCard extends BaseCard {
         })).setHeader("Aksi");
 
         todayGrid.setAllRowsVisible(true);
-        add(todayHeaderLayout, todayGrid);
+
+        // Inisialisasi konfigurasi tampilan paginasi
+        setupPaginationLayout();
+
+        // Tambahkan layout paginasi di bawah grid
+        add(todayHeaderLayout, todayGrid, paginationLayout);
+    }
+
+    /**
+     * Mengonfigurasi tampilan dan fungsionalitas tombol navigasi halaman.
+     */
+    private void setupPaginationLayout() {
+        prevBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        prevBtn.getStyle()
+            .set("background-color", "rgba(0, 255, 102, 0.1)")
+            .set("color", "#00ff66")
+            .set("border", "1px solid rgba(0, 255, 102, 0.3)")
+            .set("font-weight", "600")
+            .set("cursor", "pointer");
+
+        nextBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        nextBtn.getStyle()
+            .set("background-color", "rgba(0, 255, 102, 0.1)")
+            .set("color", "#00ff66")
+            .set("border", "1px solid rgba(0, 255, 102, 0.3)")
+            .set("font-weight", "600")
+            .set("cursor", "pointer");
+
+        pageInfo.getStyle()
+            .set("color", "#9ca3af")
+            .set("font-size", "14px")
+            .set("font-weight", "600")
+            .set("margin", "0 15px");
+
+        paginationLayout.setWidthFull();
+        paginationLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        paginationLayout.setAlignItems(Alignment.CENTER);
+        paginationLayout.getStyle().set("margin-top", "16px");
+
+        paginationLayout.add(prevBtn, pageInfo, nextBtn);
+
+        // Logika klik tombol Sebelumnya
+        prevBtn.addClickListener(e -> {
+            if (currentPage > 0) {
+                currentPage--;
+                updateGridPage();
+            }
+        });
+
+        // Logika klik tombol Berikutnya
+        nextBtn.addClickListener(e -> {
+            int totalPages = (int) Math.ceil((double) allTodayData.size() / PAGE_SIZE);
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                updateGridPage();
+            }
+        });
+
+        // Sembunyikan secara default saat belum ada data
+        paginationLayout.setVisible(false);
+    }
+
+    /**
+     * Memperbarui item yang ditampilkan di Grid berdasarkan halaman saat ini.
+     */
+    private void updateGridPage() {
+        int totalDataSize = allTodayData.size();
+
+        if (totalDataSize > PAGE_SIZE) {
+            paginationLayout.setVisible(true);
+
+            int totalPages = (int) Math.ceil((double) totalDataSize / PAGE_SIZE);
+            
+            // Mencegah error jika indeks halaman saat ini melebihi jumlah halaman maksimal setelah update data
+            if (currentPage >= totalPages) {
+                currentPage = Math.max(0, totalPages - 1);
+            }
+
+            int fromIndex = currentPage * PAGE_SIZE;
+            int toIndex = Math.min(fromIndex + PAGE_SIZE, totalDataSize);
+
+            // Tampilkan potongan data sesuai halaman saat ini
+            List<VisitorLogResponse> pageData = allTodayData.subList(fromIndex, toIndex);
+            todayGrid.setItems(pageData);
+
+            // Memperbarui teks info halaman dan status tombol aktif/nonaktif
+            pageInfo.setText(String.format("Halaman %d dari %d", currentPage + 1, totalPages));
+            prevBtn.setEnabled(currentPage > 0);
+            nextBtn.setEnabled(currentPage < totalPages - 1);
+        } else {
+            // Sembunyikan kontrol paginasi jika data <= 10, lalu tampilkan semua data sekaligus
+            paginationLayout.setVisible(false);
+            todayGrid.setItems(allTodayData);
+            currentPage = 0;
+        }
     }
 
     /**
@@ -200,7 +306,11 @@ public class TodayVisitorsCard extends BaseCard {
 
     public void refreshTodayData() {
         List<VisitorLogResponse> todayLogs = visitorManagementService.getTodayLogs();
-        todayGrid.setItems(todayLogs);
+        allTodayData.clear();
+        if (todayLogs != null) {
+            allTodayData.addAll(todayLogs);
+        }
+        updateGridPage();
     }
     
 }

@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @PermitAll
 public class MainView extends VerticalLayout {
 
-    private final VisitorManagementService visitorManagementService;
+private final VisitorManagementService visitorManagementService;
 
     // Deklarasi sub-komponen UI yang sudah dipecah di file terpisah
     private RegistrationFormCard registrationFormCard;
@@ -167,6 +167,35 @@ public class MainView extends VerticalLayout {
         
         // Masukkan semua konten ke MainView setelah Navbar
         add(contentLayout);
+
+        // --- SCROLLBAR ---
+        UI.getCurrent().getElement().executeJs(
+            "const style = document.createElement('style');" +
+            "style.textContent = ` " +
+            "  /* Browser berbasis Chromium (Chrome, Edge, Safari, Opera) */ " +
+            "  ::-webkit-scrollbar { " +
+            "    width: 10px; " +
+            "    height: 10px; " +
+            "  } " +
+            "  ::-webkit-scrollbar-track { " +
+            "    background: #090d16; " +
+            "  } " +
+            "  ::-webkit-scrollbar-thumb { " +
+            "    background: #1f2937; " +
+            "    border-radius: 6px; " +
+            "    border: 2px solid #090d16; " +
+            "  } " +
+            "  ::-webkit-scrollbar-thumb:hover { " +
+            "    background: rgba(0, 255, 102, 0.4); " +
+            "  } " +
+            "  /* Browser Mozilla Firefox */ " +
+            "  * { " +
+            "    scrollbar-width: thin; " +
+            "    scrollbar-color: #1f2937 #090d16; " +
+            "  } " +
+            "`;" +
+            "document.head.appendChild(style);"
+        );
 
         // Pemuatan data pertama kali saat halaman dibuka
         refreshAllData();
