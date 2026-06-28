@@ -2,20 +2,17 @@ package com.vigi.gate.views.component.visitorhistory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vigi.gate.dto.VisitorLogResponse;
@@ -23,15 +20,19 @@ import com.vigi.gate.enumlevel.RiskLevel;
 import com.vigi.gate.service.VisitorManagementService;
 import com.vigi.gate.views.VistorHistoryView;
 import com.vigi.gate.views.component.BaseCard;
+import com.vigi.gate.views.component.GridPagination;
 
 public class VisitorHistoryTableCard extends BaseCard {
 
-    private final VisitorManagementService visitorManagementService;
-    private final VistorHistoryView vistorHistoryView;
+    final VisitorManagementService visitorManagementService;
+    final VistorHistoryView vistorHistoryView;
     
     private final Grid<VisitorLogResponse> grid = new Grid<>();
     private final Span recordCountLabel = new Span("Memuat data...");
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm");
+    
+    // Deklarasi object GridPagination kustom
+    private final GridPagination<VisitorLogResponse> pagination;
 
     public VisitorHistoryTableCard(VisitorManagementService visitorManagementService, 
                                    ListDataProvider<VisitorLogResponse> dataProvider, 
@@ -50,7 +51,10 @@ public class VisitorHistoryTableCard extends BaseCard {
             .set("--lumo-body-text-color", "#f3f4f6")     // Teks isi tabel
             .set("--lumo-secondary-text-color", "#9ca3af")// Teks header tabel
             .set("--lumo-contrast-10pct", "rgba(255, 255, 255, 0.04)") // Garis baris (zebra striping)
-            .set("--lumo-contrast-20pct", "rgba(255, 255, 255, 0.1)");  // Garis batas sel tabel
+            .set("--lumo-contrast-20pct", "rgba(255, 255, 255, 0.1)")  // Garis batas sel tabel
+            .set("display", "flex")
+            .set("flex-direction", "column")
+            .set("overflow", "hidden");
 
         H3 tableTitle = new H3("Data Visitor");
         tableTitle.getStyle()
@@ -66,13 +70,12 @@ public class VisitorHistoryTableCard extends BaseCard {
         topActions.setAlignItems(Alignment.CENTER);
         add(topActions);
 
-        // Sambungkan komponen grid tabel ke objek data provider bersama yang dikelola kelas induk
-        grid.setDataProvider(dataProvider);
-
         grid.getStyle()
             .set("background-color", "#111827")
             .set("border", "1px solid rgba(255, 255, 255, 0.08)")
-            .set("border-radius", "8px");
+            .set("border-radius", "8px")
+            .set("scrollbar-color", "#1e293b #111827")
+            .set("scrollbar-width", "thin");
 
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_ROW_STRIPES);
 
@@ -90,7 +93,6 @@ public class VisitorHistoryTableCard extends BaseCard {
             Span badge = new Span(level.name());
             badge.getStyle().set("font-weight", "800");
             
-            // Konfigurasi warna teks badge resiko yang adaptif di layar gelap
             if (RiskLevel.RED.equals(level)) {
                 badge.getStyle().set("color", "#f87171").set("text-shadow", "0 0 6px rgba(248, 113, 113, 0.4)");
             } else if (RiskLevel.YELLOW.equals(level)) {
@@ -116,7 +118,8 @@ public class VisitorHistoryTableCard extends BaseCard {
                     .set("object-fit", "cover")
                     .set("cursor", "pointer")
                     .set("transition", "transform 0.2s");
-                imgPreview.addClickListener(e -> openPhotoModal(res.getPhotoUrl()));
+                
+                imgPreview.addClickListener(e -> new VisitorPhotoDialog(res.getPhotoUrl()).open());
                 return imgPreview;
             } else {
                 Span noPhotoSpan = new Span("Tidak ada");
@@ -131,14 +134,13 @@ public class VisitorHistoryTableCard extends BaseCard {
             deleteBtn.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
  
             deleteBtn.getStyle()
-                .set("background-color", "rgba(239, 68, 68, 0.15)") // Warna dasar merah redup transparan
-                .set("color", "#f87171")                             // Warna teks merah soft
-                .set("border", "1px solid rgba(239, 68, 68, 0.4)")  // Border merah tipis
+                .set("background-color", "rgba(239, 68, 68, 0.15)")
+                .set("color", "#f87171")
+                .set("border", "1px solid rgba(239, 68, 68, 0.4)")
                 .set("font-weight", "600")
                 .set("cursor", "pointer")
-                .set("transition", "all 0.2s ease-in-out");          // Transisi animasi menyeluruh
+                .set("transition", "all 0.2s ease-in-out");
                 
-            // Menambahkan efek hover kustom pada tombol Hapus
             deleteBtn.getElement().addEventListener("mouseover", e -> {
                 deleteBtn.getStyle()
                     .set("background-color", "#ef4444")
@@ -153,7 +155,7 @@ public class VisitorHistoryTableCard extends BaseCard {
                     .remove("box-shadow");
             });
 
-            deleteBtn.addClickListener(e -> showDeleteConfirmation(res));
+            deleteBtn.addClickListener(e -> new VisitorDeleteConfirmDialog(res, visitorManagementService, vistorHistoryView).open());
             
             HorizontalLayout layout = new HorizontalLayout(deleteBtn);
             layout.setJustifyContentMode(JustifyContentMode.CENTER);
@@ -161,8 +163,32 @@ public class VisitorHistoryTableCard extends BaseCard {
         })).setHeader("Aksi").setAutoWidth(true);
 
         grid.setPageSize(15);
-        grid.setAllRowsVisible(true);
-        add(grid);
+        grid.setHeight("550px");
+        
+        // Inisialisasi komponen paginasi (Gunakan ukuran 10 atau 15 sesuai kebutuhan halamanmu, anaf)
+        pagination = new GridPagination<>(grid, 10);
+        
+        // Ambil data jika memang dari awal sudah ada isinya
+        pagination.setData(new ArrayList<>(dataProvider.getItems()));
+
+        // SOLUSI UTAMA: Pasang listener agar otomatis mendeteksi ketika dataProvider diisi/diubah oleh View induk
+        dataProvider.addDataProviderListener(event -> {
+            // Mengambil item yang lolos dari filter dataProvider saat ini
+            ArrayList<VisitorLogResponse> filteredItems = dataProvider.getItems().stream()
+                    .filter(item -> dataProvider.getFilter() == null || dataProvider.getFilter().test(item))
+                    .collect(Collectors.toCollection(ArrayList::new));
+            
+            pagination.setData(filteredItems);
+        });
+
+        // Masukkan komponen grid dan layout kontrol paginasi ke view
+        add(grid, pagination.getLayout());
+    }
+    
+    public void refreshPaginationData(ArrayList<VisitorLogResponse> updatedList) {
+        if (pagination != null) {
+            pagination.setData(updatedList);
+        }
     }
 
     public void updateRecordCountLabel(String text) {
@@ -172,102 +198,6 @@ public class VisitorHistoryTableCard extends BaseCard {
     private String formatDateTimeString(LocalDateTime localDateTime) {
         if (localDateTime == null) return "-";
         return localDateTime.format(dateTimeFormatter);
-    }
-
-    private void openPhotoModal(String photoUrl) {
-        Dialog photoDialog = new Dialog();
-        photoDialog.setCloseOnEsc(true);
-        photoDialog.setCloseOnOutsideClick(true);
-
-        photoDialog.getElement().executeJs(
-            "this.$.overlay.$.overlay.style.backgroundColor = '#1e293b';" +
-            "this.$.overlay.$.overlay.style.color = '#f1f5f9';"
-        );
-
-        H3 dialogTitle = new H3("Foto Visitor");
-        dialogTitle.getStyle()
-            .set("margin-top", "0")
-            .set("margin-bottom", "20px")
-            .set("color", "#00ff66");
-
-        VerticalLayout photoWrapper = new VerticalLayout();
-        photoWrapper.setAlignItems(Alignment.CENTER);
-        photoWrapper.setJustifyContentMode(JustifyContentMode.CENTER);
-        photoWrapper.setPadding(false);
-
-        Image fullImage = new Image(photoUrl, "Foto Visitor Besar");
-        fullImage.getStyle()
-            .set("max-width", "100%")
-            .set("max-height", "400px")
-            .set("border-radius", "8px")
-            .set("box-shadow", "0 4px 12px rgba(0,0,0,0.5)");
-        photoWrapper.add(fullImage);
-
-        Button closeBtn = new Button("Tutup", event -> photoDialog.close());
-        closeBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        closeBtn.getStyle().set("color", "#9ca3af");
-
-        HorizontalLayout footer = new HorizontalLayout(closeBtn);
-        footer.setWidthFull();
-        footer.setJustifyContentMode(JustifyContentMode.END);
-        footer.getStyle().set("margin-top", "16px");
-
-        photoDialog.add(dialogTitle, photoWrapper, footer);
-        photoDialog.open();
-    }
-
-    private void showDeleteConfirmation(VisitorLogResponse res) {
-        Dialog confirmDialog = new Dialog();
-        confirmDialog.setCloseOnEsc(true);
-        confirmDialog.setCloseOnOutsideClick(true);
-
-        confirmDialog.getElement().executeJs(
-            "this.$.overlay.$.overlay.style.backgroundColor = '#1e293b';" +
-            "this.$.overlay.$.overlay.style.color = '#f1f5f9';"
-        );
-
-        H3 dialogTitle = new H3("Konfirmasi Hapus Data");
-        dialogTitle.getStyle().set("margin-top", "0").set("color", "#f87171");
-
-        Paragraph bodyText = new Paragraph("Apakah Anda yakin ingin menghapus data visitor " + res.getFullName() + "?");
-        bodyText.getStyle().set("color", "#9ca3af"); 
-
-        Paragraph warningText = new Paragraph("Tindakan ini tidak dapat dibatalkan.");
-        warningText.getStyle().set("color", "#f87171").set("font-weight", "700").set("font-size", "13px");
-
-        Button confirmBtn = new Button("Hapus", event -> {
-            try {
-                visitorManagementService.deleteVisitor(res.getLogId());
-                Notification.show("Data visitor berhasil dihapus.", 3000, Notification.Position.TOP_CENTER)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                confirmDialog.close();
-                
-                vistorHistoryView.refreshHistoryData();
-            } catch (Exception ex) {
-                Notification.show("Gagal menghapus data visitor.", 5000, Notification.Position.TOP_CENTER)
-                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
-                confirmDialog.close();
-            }
-        });
-        confirmBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
-
-        confirmBtn.getStyle().set("transition", "background-color 0.2s");
-        confirmBtn.getElement().addEventListener("mouseover", e -> confirmBtn.getStyle().set("background-color", "#dc2626"));
-        confirmBtn.getElement().addEventListener("mouseout", e -> confirmBtn.getStyle().set("background-color", ""));
-
-        Button cancelBtn = new Button("Batal", event -> confirmDialog.close());
-        cancelBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        cancelBtn.getStyle().set("color", "#9ca3af").set("transition", "color 0.2s");
-        cancelBtn.getElement().addEventListener("mouseover", e -> cancelBtn.getStyle().set("color", "#ffffff"));
-        cancelBtn.getElement().addEventListener("mouseout", e -> cancelBtn.getStyle().set("color", "#9ca3af"));
-
-        HorizontalLayout footerLayout = new HorizontalLayout(cancelBtn, confirmBtn);
-        footerLayout.setWidthFull();
-        footerLayout.setJustifyContentMode(JustifyContentMode.END);
-        footerLayout.getStyle().set("margin-top", "20px");
-
-        confirmDialog.add(dialogTitle, bodyText, warningText, footerLayout);
-        confirmDialog.open();
     }
     
 }
