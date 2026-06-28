@@ -165,13 +165,13 @@ public class VisitorHistoryTableCard extends BaseCard {
         grid.setPageSize(15);
         grid.setHeight("550px");
         
-        // Inisialisasi komponen paginasi (Gunakan ukuran 10 atau 15 sesuai kebutuhan halamanmu, anaf)
+        // Inisialisasi komponen paginasi
         pagination = new GridPagination<>(grid, 10);
         
         // Ambil data jika memang dari awal sudah ada isinya
         pagination.setData(new ArrayList<>(dataProvider.getItems()));
 
-        // SOLUSI UTAMA: Pasang listener agar otomatis mendeteksi ketika dataProvider diisi/diubah oleh View induk
+        // Pasang listener agar otomatis mendeteksi ketika dataProvider diisi/diubah oleh View induk
         dataProvider.addDataProviderListener(event -> {
             // Mengambil item yang lolos dari filter dataProvider saat ini
             ArrayList<VisitorLogResponse> filteredItems = dataProvider.getItems().stream()
