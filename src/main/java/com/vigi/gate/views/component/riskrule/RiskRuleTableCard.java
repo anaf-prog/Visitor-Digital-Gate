@@ -46,7 +46,9 @@ public class RiskRuleTableCard extends BaseCard{
             .set("--lumo-contrast-10pct", "rgba(255, 255, 255, 0.08)") // Efek hover pada baris
             .set("--lumo-contrast-20pct", "rgba(255, 255, 255, 0.15)") // Warna garis pembatas (border)
             .set("border", "1px solid rgba(255, 255, 255, 0.1)")       // Garis batas luar tabel
-            .set("border-radius", "8px");
+            .set("border-radius", "8px")
+            .set("scrollbar-color", "#1e293b #0f172a") 
+            .set("scrollbar-width", "thin");
 
         grid.addColumn(RiskRule::getRuleName).setHeader("Rule").setSortable(true);
         grid.addColumn(rule -> rule.getConditionType() + ": " + rule.getConditionValue()).setHeader("Kondisi");
@@ -113,7 +115,11 @@ public class RiskRuleTableCard extends BaseCard{
             return actions;
         })).setHeader("Aksi").setAutoWidth(true);
 
-        grid.setAllRowsVisible(true);
+        grid.setHeightFull();
+
+        getStyle().set("display", "flex")
+                  .set("flex-direction", "column")
+                  .set("overflow", "hidden");
         add(grid);
     }
 

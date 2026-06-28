@@ -56,7 +56,22 @@ public class GridSearchFilter<T> {
             .set("color", "#ef4444")
             .set("border", "1px solid rgba(239, 68, 68, 0.3)")
             .set("font-weight", "600")
-            .set("cursor", "pointer");
+            .set("cursor", "pointer")
+            .set("transition", "all 0.2s ease-in-out"); // Menambahkan efek transisi smooth agar tidak kaku saat di-hover
+
+        // Efek hover kustom pada tombol Reset
+        resetBtn.getElement().addEventListener("mouseover", e -> {
+            resetBtn.getStyle()
+                .set("background-color", "#ef4444")
+                .set("color", "#ffffff")
+                .set("box-shadow", "0 0 10px rgba(239, 68, 68, 0.45)");
+        });
+        resetBtn.getElement().addEventListener("mouseout", e -> {
+            resetBtn.getStyle()
+                .set("background-color", "rgba(239, 68, 68, 0.1)")
+                .set("color", "#ef4444")
+                .remove("box-shadow");
+        });
 
         // Penggabungan komponen ke dalam tata letak horizontal
         filterLayout.add(nameField, nikField, resetBtn);
